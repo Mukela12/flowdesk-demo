@@ -347,7 +347,7 @@ export default function DocumentView() {
                 <Calendar className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--text-muted)' }} />
                 <span style={{ color: 'var(--text-secondary)' }}>Date</span>
                 <span className="ml-auto font-medium" style={{ color: 'var(--text-primary)' }}>
-                  {doc.date}
+                  {new Date(doc.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                 </span>
               </div>
               <div className="flex items-center gap-3 text-sm">
