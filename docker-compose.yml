@@ -1,0 +1,54 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:17
+    container_name: flowdesk-db
+    environment:
+      POSTGRES_DB: flowdesk
+      POSTGRES_USER: flowdesk
+      POSTGRES_PASSWORD: flowdesk_secret
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U flowdesk"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  server:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    container_name: flowdesk-server
+    environment:
+      PORT: 3001
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: flowdesk
+      DB_USER: flowdesk
+      DB_PASSWORD: flowdesk_secret
+      JWT_SECRET: ${JWT_SECRET:-flowdesk-production-secret-change-me}
+    ports:
+      - "3001:3001"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - uploads:/app/server/uploads
+
+  client:
+    build:
+      context: .
+      dockerfile: client/Dockerfile
+    container_name: flowdesk-client
+    ports:
+      - "80:80"
+    depends_on:
+      - server
+
+volumes:
+  pgdata:
+  uploads:
