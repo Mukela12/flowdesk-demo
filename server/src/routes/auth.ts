@@ -5,6 +5,51 @@ import { generateToken, authMiddleware, type AuthRequest } from '../middleware/a
 
 const router = Router()
 
+// POST /api/auth/signup
+router.post('/signup', async (req, res) => {
+  try {
+    const { name, email, password, role } = req.body
+
+    if (!name || !email || !password) {
+      res.status(400).json({ error: 'Name, email and password are required' })
+      return
+    }
+
+    const validRole = role === 'manager' ? 'manager' : 'accountant'
+
+    // Check if email already exists
+    const existing = await pool.query('SELECT id FROM users WHERE email = $1', [email])
+    if (existing.rows.length > 0) {
+      res.status(409).json({ error: 'An account with this email already exists' })
+      return
+    }
+
+    const passwordHash = await bcrypt.hash(password, 10)
+    const result = await pool.query(
+      `INSERT INTO users (name, email, password_hash, role)
+       VALUES ($1, $2, $3, $4)
+       RETURNING id, name, email, role`,
+      [name, email, passwordHash, validRole]
+    )
+
+    const user = result.rows[0]
+    const token = generateToken({ id: user.id, role: user.role, name: user.name })
+
+    res.status(201).json({
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    })
+  } catch (err) {
+    console.error('Signup error:', err)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
 // POST /api/auth/login
 router.post('/login', async (req, res) => {
   try {

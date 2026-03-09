@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from '@/context/AuthContext'
 import Layout from '@/components/Layout'
 import Login from '@/pages/Login'
+import Signup from '@/pages/Signup'
 import Dashboard from '@/pages/Dashboard'
 import Upload from '@/pages/Upload'
 import Documents from '@/pages/Documents'
@@ -32,6 +33,10 @@ function AppRoutes() {
       <Route
         path="/login"
         element={user ? <Navigate to="/dashboard" replace /> : <Login />}
+      />
+      <Route
+        path="/signup"
+        element={user ? <Navigate to="/dashboard" replace /> : <Signup />}
       />
       <Route
         path="/"

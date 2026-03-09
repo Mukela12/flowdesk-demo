@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlowDesk — System Documentation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  @page {
+    size: A4 portrait;
+    margin: 20mm 22mm 22mm 22mm;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { font-size: 10pt; }
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    color: #1a1a2e;
+    line-height: 1.7;
+    background: #fff;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .break { page-break-before: always; }
+  .cover-section { page-break-after: always; }
+  h2, h3, h4 { page-break-after: avoid; }
+  table, .box, .diagram { page-break-inside: avoid; }
+
+  /* Header */
+  .hdr {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding-bottom: 8px;
+    border-bottom: 1.5px solid #e5e7eb;
+  }
+  .hdr-left { display: flex; align-items: center; gap: 8px; }
+  .hdr-logo {
+    height: 22px; width: 22px; border-radius: 5px;
+    background: #3b82f6; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10pt; font-weight: 700;
+  }
+  .hdr-left span { font-size: 9pt; font-weight: 600; color: #3d3d5c; }
+  .hdr-right { font-size: 7.5pt; color: #9ca3af; font-weight: 500; letter-spacing: 0.6px; text-transform: uppercase; }
+
+  /* Cover */
+  .cover {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 120px 0 80px;
+  }
+  .cover-icon {
+    height: 64px; width: 64px; border-radius: 16px;
+    background: #3b82f6; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28pt; font-weight: 700; margin-bottom: 28px;
+  }
+  .cover h1 { font-size: 30pt; font-weight: 700; color: #0f0f23; letter-spacing: -0.8px; margin-bottom: 6px; }
+  .cover .tagline { font-size: 11pt; color: #6b7280; margin-bottom: 48px; line-height: 1.6; }
+  .cover .doc-label {
+    font-size: 10pt; font-weight: 600; color: #1a1a2e;
+    letter-spacing: 2.5px; text-transform: uppercase;
+    border: 2px solid #1a1a2e; padding: 9px 32px; border-radius: 4px;
+  }
+  .cover .meta { margin-top: 56px; font-size: 8.5pt; color: #9ca3af; line-height: 2.2; }
+
+  /* Typography */
+  h2 {
+    font-size: 16pt; font-weight: 700; color: #0f0f23;
+    margin-bottom: 10px; letter-spacing: -0.2px;
+    padding-bottom: 6px; border-bottom: 2px solid #e5e7eb;
+  }
+  h3 { font-size: 11.5pt; font-weight: 600; color: #1a1a2e; margin: 18px 0 6px; }
+  h3:first-child { margin-top: 0; }
+  h4 { font-size: 10pt; font-weight: 600; color: #2d2d4a; margin: 12px 0 4px; }
+  p { margin-bottom: 9px; color: #2d2d4a; }
+  .intro { font-size: 10.5pt; color: #4b5563; line-height: 1.8; margin-bottom: 14px; }
+
+  /* Code */
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8.5pt;
+    background: #f4f5f7;
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: #2d2d4a;
+  }
+
+  /* Diagrams */
+  .diagram {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 7.5pt;
+    background: #f8f9fb;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 14px 16px;
+    line-height: 1.5;
+    white-space: pre;
+    overflow-x: hidden;
+    margin: 10px 0 14px;
+    color: #374151;
+  }
+
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; font-size: 9pt; margin: 8px 0 14px; }
+  thead th {
+    text-align: left; padding: 7px 10px; background: #f8f9fb;
+    font-weight: 600; font-size: 8pt; text-transform: uppercase;
+    letter-spacing: 0.5px; color: #6b7280; border-bottom: 1.5px solid #e5e7eb;
+  }
+  tbody td { padding: 6px 10px; border-bottom: 1px solid #f0f0f4; color: #2d2d4a; vertical-align: top; }
+  tbody tr:last-child td { border-bottom: none; }
+
+  /* Stats */
+  .stats { display: flex; gap: 12px; margin: 12px 0 16px; }
+  .stat {
+    flex: 1; text-align: center; padding: 14px 10px;
+    background: #f8f9fb; border: 1px solid #e5e7eb; border-radius: 6px;
+  }
+  .stat-n { display: block; font-size: 20pt; font-weight: 700; color: #3b82f6; letter-spacing: -0.5px; }
+  .stat-l { font-size: 7.5pt; color: #6b7280; text-transform: uppercase; letter-spacing: 0.6px; font-weight: 500; }
+
+  /* Boxes */
+  .box {
+    background: #f8f9fb; border: 1px solid #e5e7eb; border-radius: 6px;
+    padding: 12px 16px; margin: 10px 0 14px; font-size: 9pt; color: #374151;
+  }
+  .box-accent {
+    background: #eff6ff; border: 1px solid #bfdbfe; border-left: 3px solid #3b82f6;
+  }
+  .box-warn {
+    background: #fffbeb; border: 1px solid #fde68a; border-left: 3px solid #f59e0b;
+  }
+  .box-danger {
+    background: #fef2f2; border: 1px solid #fecaca; border-left: 3px solid #ef4444;
+  }
+  .box h4 { margin-top: 0; margin-bottom: 4px; }
+
+  /* Lists */
+  ul.clean { list-style: none; margin: 6px 0 12px; }
+  ul.clean li { padding: 4px 0 4px 16px; position: relative; font-size: 9pt; }
+  ul.clean li::before { content: ""; position: absolute; left: 0; top: 11px; width: 5px; height: 5px; border-radius: 50%; background: #3b82f6; }
+
+  /* TOC */
+  .toc { list-style: none; margin: 12px 0; }
+  .toc li { padding: 6px 0; border-bottom: 1px solid #f4f5f7; display: flex; justify-content: space-between; font-size: 9.5pt; }
+  .toc li span:first-child { color: #2d2d4a; }
+  .toc li span:last-child { color: #9ca3af; font-size: 9pt; }
+  .toc-sec span:first-child { font-weight: 600; color: #0f0f23 !important; font-size: 10pt; }
+
+  /* Flow boxes */
+  .flow { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin: 10px 0 14px; }
+  .flow-box {
+    background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 5px;
+    padding: 6px 12px; font-size: 8.5pt; font-weight: 500; color: #1e40af;
+    white-space: nowrap;
+  }
+  .flow-arrow { color: #9ca3af; font-size: 11pt; }
+
+  /* Two-col */
+  .two-col { display: flex; gap: 14px; margin: 10px 0 14px; }
+  .two-col > div { flex: 1; }
+
+  @media print {
+    body { font-size: 9.5pt; }
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover-section">
+  <div class="cover">
+    <div class="cover-icon">F</div>
+    <h1>FlowDesk</h1>
+    <p class="tagline">Document Approval &amp; Workflow System</p>
+    <div class="doc-label">System Documentation</div>
+    <div class="meta">
+      Version 1.0 &nbsp;&bull;&nbsp; March 2026<br>
+      Prepared by Mukela Katungu<br>
+      Live Demo: flowdesk-demo.netlify.app
+    </div>
+  </div>
+</div>
+
+<!-- TOC -->
+<div class="hdr">
+  <div class="hdr-left"><div class="hdr-logo">F</div><span>FlowDesk</span></div>
+  <div class="hdr-right">System Documentation</div>
+</div>
+
+<h2>Table of Contents</h2>
+<ul class="toc">
+  <li class="toc-sec"><span>1. System Overview</span><span>3</span></li>
+  <li><span>&nbsp;&nbsp;&nbsp;1.1 Tech Stack</span><span>3</span></li>
+  <li><span>&nbsp;&nbsp;&nbsp;1.2 System Stats</span><span>3</span></li>
+  <li class="toc-sec"><span>2. Architecture Diagram</span><span>4</span></li>
+  <li class="toc-sec"><span>3. User Roles &amp; Permissions</span><span>5</span></li>
+  <li class="toc-sec"><span>4. Document Workflow</span><span>6</span></li>
+  <li><span>&nbsp;&nbsp;&nbsp;4.1 Upload &amp; Metadata</span><span>6</span></li>
+  <li><span>&nbsp;&nbsp;&nbsp;4.2 The Approval Loop</span><span>6</span></li>
+  <li><span>&nbsp;&nbsp;&nbsp;4.3 Resubmission Flow</span><span>7</span></li>
+  <li class="toc-sec"><span>5. Database Schema</span><span>8</span></li>
+  <li class="toc-sec"><span>6. API Reference</span><span>9</span></li>
+  <li><span>&nbsp;&nbsp;&nbsp;6.1 Authentication</span><span>9</span></li>
+  <li><span>&nbsp;&nbsp;&nbsp;6.2 Documents</span><span>9</span></li>
+  <li><span>&nbsp;&nbsp;&nbsp;6.3 Webhooks</span><span>10</span></li>
+  <li class="toc-sec"><span>7. Webhook Integration</span><span>11</span></li>
+  <li><span>&nbsp;&nbsp;&nbsp;7.1 Inbound Webhooks</span><span>11</span></li>
+  <li><span>&nbsp;&nbsp;&nbsp;7.2 Outbound Webhooks</span><span>11</span></li>
+  <li class="toc-sec"><span>8. File Handling &amp; Preview</span><span>12</span></li>
+  <li class="toc-sec"><span>9. Authentication &amp; Security</span><span>13</span></li>
+  <li class="toc-sec"><span>10. Production Adaptation Guide</span><span>14</span></li>
+</ul>
+
+<!-- SECTION 1 -->
+<div class="break"></div>
+<div class="hdr">
+  <div class="hdr-left"><div class="hdr-logo">F</div><span>FlowDesk</span></div>
+  <div class="hdr-right">System Documentation</div>
+</div>
+
+<h2>1. System Overview</h2>
+
+<p class="intro">
+  FlowDesk is a web-based document approval and workflow management system. It manages the lifecycle of accounting and purchase documents through a "Review &rarr; Approve/Reject &rarr; Archive" pipeline. Documents enter the system via direct web upload or inbound webhooks (Google Forms / n8n), and upon approval, an outbound webhook triggers archiving in external systems like Paperless-ngx.
+</p>
+
+<h3>1.1 Tech Stack</h3>
+
+<table>
+  <thead><tr><th>Layer</th><th>Technology</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td>Frontend</td><td>React 18 + Vite + TypeScript</td><td>Single-page application with routing</td></tr>
+    <tr><td>Styling</td><td>Tailwind CSS + Custom CSS Variables</td><td>Responsive design with dark sidebar theme</td></tr>
+    <tr><td>Backend</td><td>Express.js (Node.js + TypeScript)</td><td>REST API, authentication, file handling</td></tr>
+    <tr><td>Database</td><td>PostgreSQL (Supabase)</td><td>All application data with UUID primary keys</td></tr>
+    <tr><td>Auth</td><td>JWT (jsonwebtoken + bcryptjs)</td><td>Token-based authentication with role enforcement</td></tr>
+    <tr><td>File Storage</td><td>Cloudinary</td><td>PDF and image upload, storage, and transformation</td></tr>
+    <tr><td>Frontend Host</td><td>Netlify</td><td>Static site hosting with SPA redirects</td></tr>
+    <tr><td>Backend Host</td><td>Railway</td><td>Dockerized Node.js server</td></tr>
+    <tr><td>Icons</td><td>Lucide React + LordIcon</td><td>UI iconography with animated icons</td></tr>
+  </tbody>
+</table>
+
+<h3>1.2 System Stats</h3>
+
+<div class="stats">
+  <div class="stat"><span class="stat-n">15</span><span class="stat-l">API Endpoints</span></div>
+  <div class="stat"><span class="stat-n">5</span><span class="stat-l">DB Tables</span></div>
+  <div class="stat"><span class="stat-n">7</span><span class="stat-l">Pages</span></div>
+  <div class="stat"><span class="stat-n">2</span><span class="stat-l">User Roles</span></div>
+</div>
+
+<!-- SECTION 2 -->
+<div class="break"></div>
+<div class="hdr">
+  <div class="hdr-left"><div class="hdr-logo">F</div><span>FlowDesk</span></div>
+  <div class="hdr-right">System Documentation</div>
+</div>
+
+<h2>2. Architecture Diagram</h2>
+
+<p class="intro">The system uses a decoupled frontend/backend architecture. The React SPA communicates with the Express API server via REST. The API server coordinates between PostgreSQL (data), Cloudinary (files), and external systems (n8n, Google Forms) via webhooks.</p>
+
+<div class="diagram">
+    +------------------+          +-------------------+
+    |  Google Forms    |          |   n8n Workflow     |
+    |  (Field Data)    |          |   (Automation)     |
+    +--------+---------+          +---------+---------+
+             |                              |
+         Inbound Webhook              Outbound Webhook
+             |                              ^
+             v                              |
+    +--------+------------------------------+--------+
+    |                Express API Server               |
+    |  /api/auth/*     Authentication (JWT + bcrypt)  |
+    |  /api/documents/*  CRUD + Workflow actions       |
+    |  /api/webhooks/*   Inbound receive + logs        |
+    +---------+----------------+----------------+-----+
+              |                |                |
+      +-------+------+  +-----+------+  +------+------+
+      |  PostgreSQL  |  |  Cloudinary |  |   Resend    |
+      |  (Supabase)  |  |  (Files)    |  |  (Email)*   |
+      |  5 Tables    |  |  PDFs/Imgs  |  |  Optional   |
+      +--------------+  +-------------+  +-------------+
+              ^
+              |  REST API (HTTPS + JWT)
+              |
+    +---------+----------+
+    |    React SPA       |
+    |    (Netlify)       |
+    |  Vite + TypeScript |
+    +--------------------+
+
+    * Email notifications not yet implemented (planned)</div>
+
+<h3>Data Flow Summary</h3>
+
+<div class="two-col">
+  <div>
+    <h4>Input Path A: Web Upload</h4>
+    <ul class="clean">
+      <li>Accountant logs in and uploads PDF with metadata</li>
+      <li>File stored on Cloudinary, metadata in PostgreSQL</li>
+      <li>Document enters "Pending Review" state</li>
+    </ul>
+  </div>
+  <div>
+    <h4>Input Path B: Webhook (Google Forms)</h4>
+    <ul class="clean">
+      <li>Google Forms submits to <code>/api/webhooks/inbound</code></li>
+      <li>System creates document record automatically</li>
+      <li>Document enters "Pending Review" with source = "webhook"</li>
+    </ul>
+  </div>
+</div>
+
+<!-- SECTION 3 -->
+<div class="break"></div>
+<div class="hdr">
+  <div class="hdr-left"><div class="hdr-logo">F</div><span>FlowDesk</span></div>
+  <div class="hdr-right">System Documentation</div>
+</div>
+
+<h2>3. User Roles &amp; Permissions</h2>
+
+<p class="intro">The system enforces two distinct roles with different permission levels. Role checks happen at both the API middleware layer (server-side) and the UI layer (conditional rendering).</p>
+
+<table>
+  <thead><tr><th>Capability</th><th>Manager</th><th>Accountant</th></tr></thead>
+  <tbody>
+    <tr><td>View all documents</td><td>Yes</td><td>Yes</td></tr>
+    <tr><td>View dashboard with stats</td><td>Yes (Manager Dashboard)</td><td>Yes (Standard Dashboard)</td></tr>
+    <tr><td>Upload new documents</td><td>No</td><td>Yes</td></tr>
+    <tr><td>Approve documents</td><td>Yes</td><td>No</td></tr>
+    <tr><td>Reject documents (with note)</td><td>Yes</td><td>No</td></tr>
+    <tr><td>Delete documents</td><td>Yes</td><td>No</td></tr>
+    <tr><td>Replace &amp; resubmit rejected documents</td><td>No</td><td>Own documents only</td></tr>
+    <tr><td>View webhook logs</td><td>Yes</td><td>Yes</td></tr>
+    <tr><td>View audit trail</td><td>Yes</td><td>Yes</td></tr>
+  </tbody>
+</table>
+
+<h3>Role Enforcement</h3>
+
+<div class="two-col">
+  <div>
+    <h4>Server-Side (Middleware)</h4>
+    <ul class="clean">
+      <li><code>authMiddleware</code> &mdash; validates JWT token on all protected routes</li>
+      <li><code>requireManager</code> &mdash; blocks non-managers from approve/reject/delete</li>
+      <li><code>requireAccountant</code> &mdash; blocks non-accountants from upload/resubmit</li>
+    </ul>
+  </div>
+  <div>
+    <h4>Client-Side (UI)</h4>
+    <ul class="clean">
+      <li>Upload button only shown to accountants</li>
+      <li>Approve/Reject buttons only shown to managers</li>
+      <li>Resubmit button only shown to the original uploader</li>
+      <li>Manager sees "Manager Dashboard" heading</li>
+    </ul>
+  </div>
+</div>
+
+<div class="box box-accent">
+  <h4>Resubmission Permission Logic</h4>
+  <p style="margin-bottom:0;">The resubmit action has a compound check: the user must be an accountant AND the document must have status <code>"needs_correction"</code> AND the user must be the original uploader (<code>uploadedBy.id === user.id</code>). This prevents one accountant from modifying another's rejected document.</p>
+</div>
+
+<!-- SECTION 4 -->
+<div class="break"></div>
+<div class="hdr">
+  <div class="hdr-left"><div class="hdr-logo">F</div><span>FlowDesk</span></div>
+  <div class="hdr-right">System Documentation</div>
+</div>
+
+<h2>4. Document Workflow</h2>
+
+<p class="intro">This is the core of FlowDesk. Every document moves through a defined lifecycle from upload to archive, with full audit trail at every step.</p>
+
+<h3>4.1 Upload &amp; Metadata</h3>
+
+<p>When an accountant uploads a document, they provide:</p>
+
+<table>
+  <thead><tr><th>Field</th><th>Type</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Title</td><td>Free text</td><td>"Q1 Office Supplies Payment"</td></tr>
+    <tr><td>Document Type</td><td>Dropdown</td><td>Payment Voucher, Journal Voucher, Purchase Order, Invoice, Receipt, Credit Note</td></tr>
+    <tr><td>Related Party</td><td>Free text</td><td>"Staples Inc."</td></tr>
+    <tr><td>Date</td><td>Date picker</td><td>2026-03-09</td></tr>
+    <tr><td>File</td><td>PDF, PNG, JPG</td><td>Max 10MB</td></tr>
+  </tbody>
+</table>
+
+<p>The file is uploaded via <code>multipart/form-data</code> to Cloudinary. The Cloudinary URL and file metadata are stored in PostgreSQL. An audit event "Document uploaded" is created automatically.</p>
+
+<h3>4.2 The Approval Loop</h3>
+
+<div class="flow">
+  <div class="flow-box">Upload / Webhook</div>
+  <span class="flow-arrow">&rarr;</span>
+  <div class="flow-box">Pending Review</div>
+  <span class="flow-arrow">&rarr;</span>
+  <div class="flow-box">Manager Reviews</div>
+</div>
+
+<div class="flow" style="margin-left: 40px;">
+  <div class="flow-box" style="background:#f0fdf4;border-color:#bbf7d0;color:#166534;">Approve</div>
+  <span class="flow-arrow">&rarr;</span>
+  <div class="flow-box" style="background:#f0fdf4;border-color:#bbf7d0;color:#166534;">Outbound Webhook</div>
+  <span class="flow-arrow">&rarr;</span>
+  <div class="flow-box" style="background:#f0fdf4;border-color:#bbf7d0;color:#166534;">n8n / Paperless-ngx</div>
+</div>
+
+<div class="flow" style="margin-left: 40px;">
+  <div class="flow-box" style="background:#fef2f2;border-color:#fecaca;color:#991b1b;">Reject (with note)</div>
+  <span class="flow-arrow">&rarr;</span>
+  <div class="flow-box" style="background:#fef2f2;border-color:#fecaca;color:#991b1b;">Needs Correction</div>
+  <span class="flow-arrow">&rarr;</span>
+  <div class="flow-box" style="background:#fef2f2;border-color:#fecaca;color:#991b1b;">Accountant Fixes</div>
+  <span class="flow-arrow">&rarr;</span>
+  <div class="flow-box">Pending Review</div>
+</div>
+
+<h4>What happens on Approve:</h4>
+<ul class="clean">
+  <li>Document status changes to <code>"approved"</code></li>
+  <li>Manager's name and timestamp stored as <code>approved_by</code> and <code>approved_at</code></li>
+  <li>Audit event: "Approved by manager"</li>
+  <li>Outbound webhook fires to configured archive endpoint (n8n)</li>
+  <li>Audit event: "Outbound webhook triggered"</li>
+  <li>Webhook log entry created with direction, URL, status, and payload</li>
+</ul>
+
+<h4>What happens on Reject:</h4>
+<ul class="clean">
+  <li>Document status changes to <code>"needs_correction"</code></li>
+  <li>Rejection note stored on the document</li>
+  <li>Audit event: "Rejected by manager" with the rejection note</li>
+  <li>Rejection banner appears on the document detail page</li>
+</ul>
+
+<!-- SECTION 4 continued -->
+<div class="break"></div>
+<div class="hdr">
+  <div class="hdr-left"><div class="hdr-logo">F</div><span>FlowDesk</span></div>
+  <div class="hdr-right">System Documentation</div>
+</div>
+
+<h3>4.3 Resubmission Flow</h3>
+
+<p>When a document is rejected, the original uploader (accountant) sees a "Replace &amp; Resubmit" button. On click:</p>
+
+<ul class="clean">
+  <li>A file picker opens for the corrected document</li>
+  <li>The new file replaces the old one on Cloudinary</li>
+  <li>Document version number increments (v1 &rarr; v2)</li>
+  <li>Status resets to <code>"pending_review"</code></li>
+  <li>Rejection note is cleared</li>
+  <li>Audit event: "Resubmitted (version N)" recorded</li>
+  <li>Document re-enters the approval queue for the manager</li>
+</ul>
+
+<div class="box">
+  <h4>Version Tracking</h4>
+  <p style="margin-bottom:0;">Each resubmission increments the document's <code>version</code> field. The version number is displayed as a badge in the UI (e.g., "Version 2"). The full history of actions is preserved in the audit trail, so there's a complete record of every upload, rejection, and resubmission.</p>
+</div>
+
+<!-- SECTION 5 -->
+<div class="break"></div>
+<div class="hdr">
+  <div class="hdr-left"><div class="hdr-logo">F</div><span>FlowDesk</span></div>
+  <div class="hdr-right">System Documentation</div>
+</div>
+
+<h2>5. Database Schema</h2>
+
+<p class="intro">Five tables in PostgreSQL with UUID primary keys. Foreign keys enforce referential integrity. All timestamps are stored with timezone (TIMESTAMPTZ).</p>
+
+<h3>users</h3>
+<table>
+  <thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td><code>id</code></td><td>UUID (PK)</td><td>Auto-generated</td></tr>
+    <tr><td><code>name</code></td><td>VARCHAR(255)</td><td>Display name</td></tr>
+    <tr><td><code>email</code></td><td>VARCHAR(255) UNIQUE</td><td>Login identifier</td></tr>
+    <tr><td><code>password_hash</code></td><td>VARCHAR(255)</td><td>bcrypt hash (10 rounds)</td></tr>
+    <tr><td><code>role</code></td><td>VARCHAR(20)</td><td><code>'manager'</code> or <code>'accountant'</code></td></tr>
+    <tr><td><code>created_at</code></td><td>TIMESTAMPTZ</td><td>Account creation time</td></tr>
+  </tbody>
+</table>
+
+<h3>documents</h3>
+<table>
+  <thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td><code>id</code></td><td>UUID (PK)</td><td>Auto-generated</td></tr>
+    <tr><td><code>title</code></td><td>VARCHAR(500)</td><td>Document title</td></tr>
+    <tr><td><code>type</code></td><td>VARCHAR(50)</td><td>payment_voucher, journal_voucher, purchase_order, invoice, receipt, credit_note</td></tr>
+    <tr><td><code>status</code></td><td>VARCHAR(30)</td><td>pending_review, needs_correction, approved, archived</td></tr>
+    <tr><td><code>related_party</code></td><td>VARCHAR(500)</td><td>Company or person name</td></tr>
+    <tr><td><code>date</code></td><td>DATE</td><td>Document date</td></tr>
+    <tr><td><code>file_name</code></td><td>VARCHAR(500)</td><td>Original filename</td></tr>
+    <tr><td><code>file_size</code></td><td>INTEGER</td><td>Bytes</td></tr>
+    <tr><td><code>file_path</code></td><td>VARCHAR(1000)</td><td>Cloudinary URL</td></tr>
+    <tr><td><code>source</code></td><td>VARCHAR(20)</td><td><code>'web_upload'</code> or <code>'webhook'</code></td></tr>
+    <tr><td><code>version</code></td><td>INTEGER</td><td>Starts at 1, increments on resubmit</td></tr>
+    <tr><td><code>rejection_note</code></td><td>TEXT</td><td>Manager's rejection reason</td></tr>
+    <tr><td><code>uploaded_by</code></td><td>UUID (FK)</td><td>References users</td></tr>
+    <tr><td><code>approved_by</code></td><td>UUID (FK)</td><td>References users (NULL until approved)</td></tr>
+    <tr><td><code>approved_at</code></td><td>TIMESTAMPTZ</td><td>Approval timestamp</td></tr>
+    <tr><td><code>webhook_triggered</code></td><td>BOOLEAN</td><td>Whether outbound webhook was sent</td></tr>
+  </tbody>
+</table>
+
+<h3>document_events (Audit Trail)</h3>
+<table>
+  <thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td><code>id</code></td><td>UUID (PK)</td><td>Auto-generated</td></tr>
+    <tr><td><code>document_id</code></td><td>UUID (FK)</td><td>References documents (CASCADE delete)</td></tr>
+    <tr><td><code>action</code></td><td>VARCHAR(500)</td><td>e.g. "Document uploaded", "Approved by manager"</td></tr>
+    <tr><td><code>user_name</code></td><td>VARCHAR(255)</td><td>Who performed the action</td></tr>
+    <tr><td><code>note</code></td><td>TEXT</td><td>Optional (used for rejection notes)</td></tr>
+    <tr><td><code>created_at</code></td><td>TIMESTAMPTZ</td><td>When the event occurred</td></tr>
+  </tbody>
+</table>
+
+<h3>webhook_logs &amp; webhook_config</h3>
+<table>
+  <thead><tr><th>Table</th><th>Purpose</th><th>Key Columns</th></tr></thead>
+  <tbody>
+    <tr><td><code>webhook_logs</code></td><td>Records every webhook (inbound/outbound)</td><td>direction, url, method, status, payload, document_id</td></tr>
+    <tr><td><code>webhook_config</code></td><td>Stores configured webhook endpoints</td><td>name, url, direction, enabled</td></tr>
+  </tbody>
+</table>
+
+<!-- SECTION 6 -->
+<div class="break"></div>
+<div class="hdr">
+  <div class="hdr-left"><div class="hdr-logo">F</div><span>FlowDesk</span></div>
+  <div class="hdr-right">System Documentation</div>
+</div>
+
+<h2>6. API Reference</h2>
+
+<p class="intro">All API endpoints are prefixed with <code>/api</code>. Authentication is via Bearer JWT token in the <code>Authorization</code> header. Protected endpoints return 401 if the token is missing or invalid.</p>
+
+<h3>6.1 Authentication</h3>
+
+<table>
+  <thead><tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td>POST</td><td><code>/api/auth/signup</code></td><td>Public</td><td>Create new account (name, email, password, role)</td></tr>
+    <tr><td>POST</td><td><code>/api/auth/login</code></td><td>Public</td><td>Login, returns JWT token + user object</td></tr>
+    <tr><td>GET</td><td><code>/api/auth/me</code></td><td>Required</td><td>Validate token, return current user</td></tr>
+  </tbody>
+</table>
+
+<h3>6.2 Documents</h3>
+
+<table>
+  <thead><tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td>GET</td><td><code>/api/documents</code></td><td>Required</td><td>List all documents (supports ?status, ?type, ?search filters)</td></tr>
+    <tr><td>GET</td><td><code>/api/documents/stats</code></td><td>Required</td><td>Dashboard stats (counts by status)</td></tr>
+    <tr><td>GET</td><td><code>/api/documents/:id</code></td><td>Required</td><td>Document detail with audit trail and uploader/approver info</td></tr>
+    <tr><td>POST</td><td><code>/api/documents</code></td><td>Accountant</td><td>Upload document (multipart/form-data with file)</td></tr>
+    <tr><td>POST</td><td><code>/api/documents/:id/approve</code></td><td>Manager</td><td>Approve document, triggers outbound webhook</td></tr>
+    <tr><td>POST</td><td><code>/api/documents/:id/reject</code></td><td>Manager</td><td>Reject document with note (JSON body: {note})</td></tr>
+    <tr><td>POST</td><td><code>/api/documents/:id/resubmit</code></td><td>Accountant</td><td>Replace file, bump version, return to pending</td></tr>
+    <tr><td>DELETE</td><td><code>/api/documents/:id</code></td><td>Manager</td><td>Permanently delete document</td></tr>
+  </tbody>
+</table>
+
+<!-- SECTION 6 continued -->
+<div class="break"></div>
+<div class="hdr">
+  <div class="hdr-left"><div class="hdr-logo">F</div><span>FlowDesk</span></div>
+  <div class="hdr-right">System Documentation</div>
+</div>
+
+<h3>6.3 Webhooks</h3>
+
+<table>
+  <thead><tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td>POST</td><td><code>/api/webhooks/inbound</code></td><td>Public*</td><td>Receive documents from Google Forms / n8n</td></tr>
+    <tr><td>GET</td><td><code>/api/webhooks/logs</code></td><td>Required</td><td>List all webhook activity (inbound + outbound)</td></tr>
+    <tr><td>GET</td><td><code>/api/webhooks/config</code></td><td>Required</td><td>Get configured webhook endpoints</td></tr>
+  </tbody>
+</table>
+
+<div class="box box-warn">
+  <h4>*Inbound Webhook Security</h4>
+  <p style="margin-bottom:0;">The inbound webhook endpoint is currently public to accept Google Forms submissions. For production, it should be secured with an API key or HMAC signature verification to prevent unauthorized document injection.</p>
+</div>
+
+<h3>Response Formats</h3>
+
+<p>All responses are JSON. Successful operations return the relevant data. Errors return:</p>
+
+<div class="diagram">
+{
+  "error": "Human-readable error message"
+}
+
+Status codes:
+  200  Success
+  201  Created (signup, upload)
+  400  Bad request (missing fields)
+  401  Unauthorized (invalid/missing token)
+  403  Forbidden (wrong role)
+  404  Not found
+  409  Conflict (duplicate email)
+  500  Internal server error</div>
+
+<!-- SECTION 7 -->
+<div class="break"></div>
+<div class="hdr">
+  <div class="hdr-left"><div class="hdr-logo">F</div><span>FlowDesk</span></div>
+  <div class="hdr-right">System Documentation</div>
+</div>
+
+<h2>7. Webhook Integration</h2>
+
+<p class="intro">FlowDesk supports both inbound and outbound webhooks, enabling integration with Google Forms, n8n, and archive systems like Paperless-ngx.</p>
+
+<h3>7.1 Inbound Webhooks (Google Forms &rarr; FlowDesk)</h3>
+
+<p>External systems can submit documents to FlowDesk by POSTing to <code>/api/webhooks/inbound</code>:</p>
+
+<div class="diagram">
+POST /api/webhooks/inbound
+Content-Type: application/json
+
+{
+  "title": "Field Purchase - Site Materials",
+  "type": "purchase_order",
+  "relatedParty": "BuildRight Supplies",
+  "date": "2026-03-09",
+  "source": "Google Forms"
+}
+
+Response: 200 { "id": "uuid", "message": "Document created from webhook" }</div>
+
+<p>The document is created with status <code>"pending_review"</code> and source <code>"webhook"</code>. A webhook icon appears in the UI to distinguish webhook-sourced documents from web uploads.</p>
+
+<h3>7.2 Outbound Webhooks (FlowDesk &rarr; n8n / Paperless-ngx)</h3>
+
+<p>When a manager approves a document, FlowDesk automatically sends an outbound POST to the configured archive endpoint:</p>
+
+<div class="diagram">
+POST https://n8n.example.com/webhook/archive
+Content-Type: application/json
+
+{
+  "documentId": "a980b3ce-d901-4db9-92ab-081d52d7dab8",
+  "title": "Information Security Assignment",
+  "type": "invoice",
+  "status": "approved",
+  "archiveTo": "paperless-ngx"
+}
+
+The webhook URL is configured in the webhook_config table.
+The response status (200, 500, etc.) is logged in webhook_logs.</div>
+
+<div class="box box-accent">
+  <h4>Webhook Monitoring</h4>
+  <p style="margin-bottom:0;">Every webhook (inbound and outbound) is logged in the <code>webhook_logs</code> table with direction, URL, HTTP method, response status, full payload, and timestamp. The Webhook Logs page in the UI provides a real-time view of all webhook activity.</p>
+</div>
+
+<!-- SECTION 8 -->
+<div class="break"></div>
+<div class="hdr">
+  <div class="hdr-left"><div class="hdr-logo">F</div><span>FlowDesk</span></div>
+  <div class="hdr-right">System Documentation</div>
+</div>
+
+<h2>8. File Handling &amp; Preview</h2>
+
+<h3>Upload Pipeline</h3>
+
+<div class="flow">
+  <div class="flow-box">Browser selects file</div>
+  <span class="flow-arrow">&rarr;</span>
+  <div class="flow-box">FormData POST to API</div>
+  <span class="flow-arrow">&rarr;</span>
+  <div class="flow-box">Multer + Cloudinary Storage</div>
+  <span class="flow-arrow">&rarr;</span>
+  <div class="flow-box">URL stored in PostgreSQL</div>
+</div>
+
+<ul class="clean">
+  <li><strong>Max file size:</strong> 10MB</li>
+  <li><strong>Allowed formats:</strong> PDF, PNG, JPG, JPEG</li>
+  <li><strong>Storage:</strong> Cloudinary <code>flowdesk/</code> folder with <code>resource_type: auto</code></li>
+  <li><strong>URL format:</strong> <code>https://res.cloudinary.com/{cloud}/image/upload/v{ver}/flowdesk/{id}.pdf</code></li>
+</ul>
+
+<h3>Document Preview</h3>
+
+<p>PDFs are previewed inline using Cloudinary's image transformation API. The first page of each PDF is converted to a high-resolution JPG on the fly:</p>
+
+<div class="diagram">
+Original:  .../upload/v1773069114/flowdesk/abc123.pdf
+Preview:   .../upload/pg_1,w_800/v1773069114/flowdesk/abc123.jpg
+
+The transformation pg_1 extracts page 1, w_800 sets width to 800px.
+Cloudinary generates and caches the JPG automatically.
+Images (PNG, JPG) are displayed directly without transformation.</div>
+
+<p>A "Download" link provides access to the original file. The preview renders as an <code>&lt;img&gt;</code> tag, ensuring cross-browser compatibility without requiring a PDF viewer plugin.</p>
+
+<!-- SECTION 9 -->
+<div class="break"></div>
+<div class="hdr">
+  <div class="hdr-left"><div class="hdr-logo">F</div><span>FlowDesk</span></div>
+  <div class="hdr-right">System Documentation</div>
+</div>
+
+<h2>9. Authentication &amp; Security</h2>
+
+<h3>JWT Authentication</h3>
+
+<div class="flow">
+  <div class="flow-box">User submits email + password</div>
+  <span class="flow-arrow">&rarr;</span>
+  <div class="flow-box">Server verifies with bcrypt</div>
+  <span class="flow-arrow">&rarr;</span>
+  <div class="flow-box">JWT token generated (24h expiry)</div>
+  <span class="flow-arrow">&rarr;</span>
+  <div class="flow-box">Token stored in localStorage</div>
+</div>
+
+<p>The JWT payload contains: <code>{ id, role, name, iat, exp }</code>. Every API request includes the token in the <code>Authorization: Bearer &lt;token&gt;</code> header. On 401, the frontend auto-redirects to login.</p>
+
+<h3>Security Measures</h3>
+
+<ul class="clean">
+  <li><strong>Password hashing:</strong> bcrypt with 10 salt rounds (passwords never stored in plaintext)</li>
+  <li><strong>Role-based middleware:</strong> <code>requireManager</code> and <code>requireAccountant</code> enforce role checks server-side</li>
+  <li><strong>CORS:</strong> Configured to allow only the production frontend domain and localhost for development</li>
+  <li><strong>File validation:</strong> Multer enforces 10MB limit and allowed file extensions</li>
+  <li><strong>SQL injection prevention:</strong> All database queries use parameterized queries (<code>$1, $2</code> placeholders)</li>
+  <li><strong>Token expiry:</strong> JWT tokens expire after 24 hours, requiring re-login</li>
+  <li><strong>Auto-redirect on 401:</strong> Expired or invalid tokens trigger automatic redirect to login page</li>
+</ul>
+
+<div class="box box-accent">
+  <h4>Session Recovery</h4>
+  <p style="margin-bottom:0;">On page load, the app checks for an existing token in localStorage and validates it by calling <code>GET /api/auth/me</code>. If the token is expired or invalid, the user is silently redirected to login. This provides persistent sessions across browser refreshes without storing sensitive data.</p>
+</div>
+
+<!-- SECTION 10 -->
+<div class="break"></div>
+<div class="hdr">
+  <div class="hdr-left"><div class="hdr-logo">F</div><span>FlowDesk</span></div>
+  <div class="hdr-right">System Documentation</div>
+</div>
+
+<h2>10. Production Adaptation Guide</h2>
+
+<p class="intro">The current demo is deployed on cloud services (Supabase, Cloudinary, Railway, Netlify). Below is what needs to change for the production deployment described in the project spec: a self-hosted Docker setup on a Linux server with PostgreSQL 17+.</p>
+
+<h3>What's Already Complete</h3>
+
+<table>
+  <thead><tr><th>Requirement</th><th>Status</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>Manager role (approve/reject/delete)</td><td>Done</td><td>Full permissions with audit trail</td></tr>
+    <tr><td>Accountant role (upload/resubmit)</td><td>Done</td><td>Restricted to own rejected documents</td></tr>
+    <tr><td>PDF upload with metadata</td><td>Done</td><td>Date, Type (dropdown), Related Party</td></tr>
+    <tr><td>Approval loop with rejection notes</td><td>Done</td><td>Status transitions + audit events</td></tr>
+    <tr><td>Outbound webhook on approval</td><td>Done</td><td>Fires POST to configured URL</td></tr>
+    <tr><td>Inbound webhook endpoint</td><td>Done</td><td>Accepts JSON from Google Forms / n8n</td></tr>
+    <tr><td>Secure login (JWT + bcrypt)</td><td>Done</td><td>Role-based access control</td></tr>
+    <tr><td>PostgreSQL database</td><td>Done</td><td>5 tables, UUID PKs, full schema</td></tr>
+    <tr><td>Full audit trail</td><td>Done</td><td>Every action logged with timestamp + user</td></tr>
+    <tr><td>Webhook logs monitoring</td><td>Done</td><td>Inbound + outbound with payload</td></tr>
+    <tr><td>Source code provided</td><td>Done</td><td>Full TypeScript codebase</td></tr>
+  </tbody>
+</table>
+
+<h3>What Needs to Change for Production</h3>
+
+<table>
+  <thead><tr><th>Item</th><th>Current (Demo)</th><th>Production Change</th><th>Effort</th></tr></thead>
+  <tbody>
+    <tr><td>Docker setup</td><td>Railway (PaaS)</td><td>Dockerfile + docker-compose.yml with Node.js + PostgreSQL 17 containers</td><td>~2 hours</td></tr>
+    <tr><td>Database</td><td>Supabase (hosted)</td><td>Self-hosted PostgreSQL 17+ in Docker, same schema</td><td>~30 min</td></tr>
+    <tr><td>File storage</td><td>Cloudinary (cloud)</td><td>Local Docker volume or S3-compatible storage (MinIO)</td><td>~2 hours</td></tr>
+    <tr><td>Outbound webhook URL</td><td>n8n.example.com</td><td>Point to real n8n instance URL</td><td>Config change</td></tr>
+    <tr><td>Inbound webhook auth</td><td>Public endpoint</td><td>Add API key or HMAC verification</td><td>~1 hour</td></tr>
+    <tr><td>Email notifications</td><td>Not implemented</td><td>Add email on rejection/approval (Nodemailer or similar)</td><td>~2 hours</td></tr>
+    <tr><td>HTTPS/SSL</td><td>Handled by Netlify/Railway</td><td>Nginx reverse proxy with Let's Encrypt</td><td>~1 hour</td></tr>
+  </tbody>
+</table>
+
+<div class="box box-warn">
+  <h4>Docker Compose Structure (Planned)</h4>
+  <p style="margin-bottom:0;">The production docker-compose.yml will include three services: <code>app</code> (Node.js Express server serving both API and React frontend), <code>db</code> (PostgreSQL 17), and <code>nginx</code> (reverse proxy with SSL). The frontend will be built and served statically by the Express server. A single <code>docker compose up</code> command will start everything.</p>
+</div>
+
+<div class="box box-accent">
+  <h4>Database Migration</h4>
+  <p style="margin-bottom:0;">The migration script (<code>server/src/db/migrate.ts</code>) automatically creates all tables with <code>CREATE TABLE IF NOT EXISTS</code>. It runs on server startup, making the database setup fully automatic. No manual SQL is needed.</p>
+</div>
+
+<!-- FOOTER -->
+<div style="margin-top: 40px; padding-top: 16px; border-top: 1.5px solid #e5e7eb; text-align: center;">
+  <p style="font-size: 8.5pt; color: #9ca3af; margin-bottom: 4px;">FlowDesk System Documentation &bull; Version 1.0 &bull; March 2026</p>
+  <p style="font-size: 8pt; color: #b0b8c4;">Prepared by Mukela Katungu &bull; flowdesk-demo.netlify.app</p>
+</div>
+
+</body>
+</html>
