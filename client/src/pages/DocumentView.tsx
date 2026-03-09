@@ -217,30 +217,42 @@ export default function DocumentView() {
                 Document Preview
               </span>
               {doc.fileUrl && (
-                <a href={doc.fileUrl} target="_blank" rel="noopener noreferrer" className="btn btn--ghost text-xs" style={{ color: 'var(--accent-500)' }}>
+                <a
+                  href={doc.fileUrl.replace('/upload/', '/upload/fl_attachment/')}
+                  className="btn btn--ghost text-xs"
+                  style={{ color: 'var(--accent-500)' }}
+                >
                   <Download className="w-3.5 h-3.5" />
                   Download
                 </a>
               )}
             </div>
-            <div
-              className="h-80 flex items-center justify-center"
-              style={{ background: 'var(--bg-muted)' }}
-            >
-              <div className="text-center">
-                <LordIcon name="system-regular-69-document-scan-hover-scan" size={64} trigger="loop" />
-                <p className="text-sm mt-3" style={{ color: 'var(--text-muted)' }}>{doc.fileName}</p>
-                {doc.fileUrl ? (
-                  <a href={doc.fileUrl} target="_blank" rel="noopener noreferrer" className="text-xs mt-1 inline-block" style={{ color: 'var(--accent-500)' }}>
-                    Open file in new tab
-                  </a>
-                ) : (
+            {doc.fileUrl ? (
+              <div className="flex items-center justify-center p-4" style={{ background: 'var(--bg-muted)', minHeight: 320 }}>
+                <img
+                  src={
+                    /\.(png|jpg|jpeg|gif|webp)$/i.test(doc.fileName)
+                      ? doc.fileUrl
+                      : doc.fileUrl.replace('/upload/', '/upload/pg_1,w_800/').replace(/\.pdf$/i, '.jpg')
+                  }
+                  alt={doc.title}
+                  className="max-w-full max-h-[600px] rounded shadow"
+                />
+              </div>
+            ) : (
+              <div
+                className="h-80 flex items-center justify-center"
+                style={{ background: 'var(--bg-muted)' }}
+              >
+                <div className="text-center">
+                  <LordIcon name="system-regular-69-document-scan-hover-scan" size={64} trigger="loop" />
+                  <p className="text-sm mt-3" style={{ color: 'var(--text-muted)' }}>{doc.fileName}</p>
                   <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
                     No file available
                   </p>
-                )}
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Actions */}

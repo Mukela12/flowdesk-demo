@@ -5,6 +5,7 @@ import { authApi } from '@/api/auth'
 interface AuthContextType {
   user: User | null
   login: (email: string, password: string) => Promise<boolean>
+  signup: (data: { name: string; email: string; password: string; role: string }) => Promise<boolean>
   logout: () => void
   isManager: boolean
   isAccountant: boolean
@@ -48,6 +49,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return false
   }, [])
 
+  const signup = useCallback(async (data: { name: string; email: string; password: string; role: string }) => {
+    const res = await authApi.signup(data)
+    if (res.token && res.user) {
+      localStorage.setItem('flowdesk_token', res.token)
+      localStorage.setItem('flowdesk_user', JSON.stringify(res.user))
+      setUser(res.user)
+      return true
+    }
+    return false
+  }, [])
+
   const logout = useCallback(() => {
     setUser(null)
     localStorage.removeItem('flowdesk_token')
@@ -59,6 +71,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         user,
         login,
+        signup,
         logout,
         isManager: user?.role === 'manager',
         isAccountant: user?.role === 'accountant',
