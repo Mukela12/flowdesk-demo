@@ -1,7 +1,8 @@
 @import "tailwindcss";
+@import "./theme.css";
 
 @theme {
-  --font-inter: 'Inter', system-ui, sans-serif;
+  --font-satoshi: 'Satoshi', system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 }
 
@@ -9,22 +10,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Satoshi', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-/* Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
 }

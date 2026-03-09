@@ -1,0 +1,481 @@
+/* ═══════════════════════════════════════════════
+   FlowDesk Theme — Based on Command Theme
+   Professional document approval workflow system
+   Dark sidebar + clean light content
+   ═══════════════════════════════════════════════ */
+
+[data-theme="flowdesk"] {
+  /* -- Surface -- */
+  --bg-base: #F8FAFC;
+  --bg-surface: #FFFFFF;
+  --bg-hover: #F1F5F9;
+  --bg-elevated: #FFFFFF;
+  --bg-muted: #F1F5F9;
+
+  /* -- Sidebar -- */
+  --sidebar-bg: #0F172A;
+  --sidebar-hover: #1E293B;
+  --sidebar-active: #1E293B;
+  --sidebar-text: #94A3B8;
+  --sidebar-text-active: #F8FAFC;
+  --sidebar-border: #1E293B;
+  --sidebar-section: #475569;
+
+  /* -- Borders -- */
+  --border-default: #E2E8F0;
+  --border-hover: #CBD5E1;
+  --border-focus: #3B82F6;
+
+  /* -- Text -- */
+  --text-primary: #0F172A;
+  --text-secondary: #64748B;
+  --text-muted: #94A3B8;
+
+  /* -- Accent (blue) -- */
+  --accent-500: #3B82F6;
+  --accent-600: #2563EB;
+  --accent-400: #60A5FA;
+  --accent-100: #DBEAFE;
+  --accent-50: #EFF6FF;
+
+  /* -- Status -- */
+  --success: #10B981;
+  --success-bg: #ECFDF5;
+  --success-text: #059669;
+  --warning: #F59E0B;
+  --warning-bg: #FFFBEB;
+  --warning-text: #B45309;
+  --error: #EF4444;
+  --error-bg: #FEF2F2;
+  --error-text: #DC2626;
+
+  /* -- Elevation -- */
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-sm: 0 2px 4px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 8px 24px rgba(15, 23, 42, 0.12);
+
+  /* ── Shadcn-compatible HSL overrides ── */
+  --background: 210 40% 98%;
+  --foreground: 222 47% 11%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+  --primary: 217 91% 60%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 210 40% 96%;
+  --secondary-foreground: 222 47% 11%;
+  --muted: 210 40% 96%;
+  --muted-foreground: 215 16% 47%;
+  --accent: 210 40% 96%;
+  --accent-foreground: 222 47% 11%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 214 32% 91%;
+  --input: 214 32% 91%;
+  --ring: 217 91% 60%;
+
+  font-family: 'Satoshi', system-ui, -apple-system, sans-serif;
+  color: var(--text-primary);
+  background-color: var(--bg-base);
+}
+
+/* -- Focus ring -- */
+[data-theme="flowdesk"] :focus-visible {
+  outline: 2px solid var(--accent-500);
+  outline-offset: 2px;
+  border-radius: inherit;
+}
+
+/* -- Page entrance -- */
+[data-theme="flowdesk"] .page-enter {
+  animation: fd-fade 200ms ease-out;
+}
+
+@keyframes fd-fade {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* -- Card -- */
+[data-theme="flowdesk"] .cmd-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  transition: border-color 0.15s ease;
+}
+
+[data-theme="flowdesk"] .cmd-card:hover {
+  border-color: var(--border-hover);
+}
+
+/* -- Sidebar nav item -- */
+[data-theme="flowdesk"] .cmd-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--sidebar-text);
+  transition: all 0.12s ease;
+  cursor: pointer;
+  text-decoration: none;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+}
+
+[data-theme="flowdesk"] .cmd-nav-item:hover {
+  background: var(--sidebar-hover);
+  color: var(--sidebar-text-active);
+}
+
+[data-theme="flowdesk"] .cmd-nav-item--active {
+  background: var(--sidebar-active);
+  color: var(--sidebar-text-active);
+}
+
+/* -- Badge -- */
+[data-theme="flowdesk"] .badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+[data-theme="flowdesk"] .badge--accent { background: var(--accent-100); color: var(--accent-600); }
+[data-theme="flowdesk"] .badge--success { background: var(--success-bg); color: var(--success-text); }
+[data-theme="flowdesk"] .badge--warning { background: var(--warning-bg); color: var(--warning-text); }
+[data-theme="flowdesk"] .badge--error { background: var(--error-bg); color: var(--error-text); }
+[data-theme="flowdesk"] .badge--neutral { background: var(--bg-muted); color: var(--text-secondary); }
+
+/* -- Button -- */
+[data-theme="flowdesk"] .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.12s ease;
+  cursor: pointer;
+  border: none;
+}
+
+[data-theme="flowdesk"] .btn--primary {
+  background: var(--accent-500);
+  color: #FFFFFF;
+}
+[data-theme="flowdesk"] .btn--primary:hover { background: var(--accent-600); }
+
+[data-theme="flowdesk"] .btn--secondary {
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-default);
+}
+[data-theme="flowdesk"] .btn--secondary:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-hover);
+  color: var(--text-primary);
+}
+
+[data-theme="flowdesk"] .btn--ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  padding: 4px 8px;
+}
+[data-theme="flowdesk"] .btn--ghost:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+[data-theme="flowdesk"] .btn--danger {
+  background: var(--error-bg);
+  color: var(--error-text);
+  border: 1px solid #FECACA;
+}
+[data-theme="flowdesk"] .btn--danger:hover { background: #FEE2E2; }
+
+[data-theme="flowdesk"] .btn--success {
+  background: var(--success);
+  color: #FFFFFF;
+}
+[data-theme="flowdesk"] .btn--success:hover { background: #059669; }
+
+/* -- Tab system -- */
+[data-theme="flowdesk"] .tab-group {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border-default);
+}
+
+[data-theme="flowdesk"] .tab-item {
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.12s ease;
+  border: none;
+  background: transparent;
+  position: relative;
+}
+
+[data-theme="flowdesk"] .tab-item:hover { color: var(--text-secondary); }
+
+[data-theme="flowdesk"] .tab-item--active {
+  color: var(--text-primary);
+}
+
+[data-theme="flowdesk"] .tab-item--active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--accent-500);
+  border-radius: 1px 1px 0 0;
+}
+
+/* -- Data table -- */
+[data-theme="flowdesk"] .cmd-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+[data-theme="flowdesk"] .cmd-table thead th {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border-default);
+  background: var(--bg-muted);
+}
+
+[data-theme="flowdesk"] .cmd-table tbody td {
+  padding: 12px 16px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border-default);
+  color: var(--text-primary);
+}
+
+[data-theme="flowdesk"] .cmd-table tbody tr {
+  transition: background 0.1s ease;
+  cursor: pointer;
+}
+
+[data-theme="flowdesk"] .cmd-table tbody tr:hover {
+  background: var(--bg-hover);
+}
+
+[data-theme="flowdesk"] .cmd-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* -- Status dot -- */
+[data-theme="flowdesk"] .status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+[data-theme="flowdesk"] .status-dot--pending { background: var(--warning); }
+[data-theme="flowdesk"] .status-dot--rejected { background: var(--error); }
+[data-theme="flowdesk"] .status-dot--approved { background: var(--success); }
+[data-theme="flowdesk"] .status-dot--archived { background: var(--text-muted); }
+
+/* -- Stat card -- */
+[data-theme="flowdesk"] .cmd-stat {
+  padding: 20px;
+}
+
+[data-theme="flowdesk"] .cmd-stat__label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+[data-theme="flowdesk"] .cmd-stat__value {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+[data-theme="flowdesk"] .cmd-stat__change {
+  font-size: 12px;
+  font-weight: 500;
+  margin-top: 4px;
+}
+
+/* -- Input fields -- */
+[data-theme="flowdesk"] .fd-input {
+  width: 100%;
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-family: inherit;
+  transition: all 0.12s ease;
+}
+
+[data-theme="flowdesk"] .fd-input:hover {
+  border-color: var(--border-hover);
+}
+
+[data-theme="flowdesk"] .fd-input:focus {
+  outline: none;
+  border-color: var(--accent-500);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+[data-theme="flowdesk"] .fd-input::placeholder {
+  color: var(--text-muted);
+}
+
+/* -- Select -- */
+[data-theme="flowdesk"] .fd-select {
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-family: inherit;
+  transition: all 0.12s ease;
+  cursor: pointer;
+}
+
+[data-theme="flowdesk"] .fd-select:hover {
+  border-color: var(--border-hover);
+}
+
+[data-theme="flowdesk"] .fd-select:focus {
+  outline: none;
+  border-color: var(--accent-500);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* -- Label -- */
+[data-theme="flowdesk"] .fd-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+/* -- Dropzone -- */
+[data-theme="flowdesk"] .fd-dropzone {
+  border: 2px dashed var(--border-default);
+  border-radius: 8px;
+  padding: 32px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background: var(--bg-surface);
+}
+
+[data-theme="flowdesk"] .fd-dropzone:hover {
+  border-color: var(--accent-400);
+  background: var(--accent-50);
+}
+
+[data-theme="flowdesk"] .fd-dropzone--active {
+  border-color: var(--accent-500);
+  background: var(--accent-50);
+}
+
+[data-theme="flowdesk"] .fd-dropzone--success {
+  border-color: var(--success);
+  background: var(--success-bg);
+}
+
+/* -- Audit timeline -- */
+[data-theme="flowdesk"] .audit-line {
+  width: 1px;
+  background: var(--border-default);
+}
+
+[data-theme="flowdesk"] .audit-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-500);
+  flex-shrink: 0;
+}
+
+[data-theme="flowdesk"] .audit-dot--muted {
+  background: var(--border-default);
+}
+
+/* -- Sidebar section label -- */
+[data-theme="flowdesk"] .sidebar-section {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--sidebar-section);
+  padding: 0 12px;
+  margin-bottom: 4px;
+}
+
+/* -- Notification pulse -- */
+[data-theme="flowdesk"] .pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--error);
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  animation: fd-pulse 2s infinite;
+}
+
+@keyframes fd-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* -- Webhook direction badges -- */
+[data-theme="flowdesk"] .wh-inbound {
+  background: var(--accent-50);
+  color: var(--accent-600);
+}
+
+[data-theme="flowdesk"] .wh-outbound {
+  background: #FAF5FF;
+  color: #7C3AED;
+}
+
+/* -- Scrollbar -- */
+[data-theme="flowdesk"] ::-webkit-scrollbar {
+  width: 6px;
+}
+[data-theme="flowdesk"] ::-webkit-scrollbar-track {
+  background: transparent;
+}
+[data-theme="flowdesk"] ::-webkit-scrollbar-thumb {
+  background: var(--border-hover);
+  border-radius: 3px;
+}
+[data-theme="flowdesk"] ::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}

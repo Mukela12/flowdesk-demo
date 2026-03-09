@@ -2,20 +2,14 @@ import { useState, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import {
   ArrowLeft,
-  FileText,
-  CheckCircle2,
-  XCircle,
-  Upload,
-  Trash2,
-  Clock,
+  Download,
   User,
   Calendar,
   Tag,
   Webhook,
-  History,
-  AlertTriangle,
-  Download,
+  Clock,
 } from 'lucide-react'
+import LordIcon from '@/shared/components/LordIcon'
 import { useAuth } from '@/context/AuthContext'
 import {
   mockGetDocument,
@@ -56,11 +50,12 @@ export default function DocumentView() {
   if (!doc) {
     return (
       <div className="max-w-4xl mx-auto text-center py-16">
-        <FileText className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-        <p className="text-slate-500">Document not found</p>
+        <LordIcon name="system-regular-69-document-scan-hover-scan" size={48} trigger="loop" />
+        <p className="mt-3" style={{ color: 'var(--text-muted)' }}>Document not found</p>
         <button
           onClick={() => navigate('/dashboard')}
-          className="mt-4 text-indigo-600 text-sm font-medium hover:underline"
+          className="btn btn--ghost mt-4"
+          style={{ color: 'var(--accent-500)' }}
         >
           Back to Dashboard
         </button>
@@ -100,32 +95,35 @@ export default function DocumentView() {
 
   return (
     <div className="max-w-4xl mx-auto">
-      {/* Header */}
+      {/* Back */}
       <button
         onClick={() => navigate(-1)}
-        className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700 mb-6 transition-colors"
+        className="btn btn--ghost mb-6"
       >
         <ArrowLeft className="w-4 h-4" />
         Back
       </button>
 
+      {/* Header */}
       <div className="flex items-start justify-between gap-4 mb-8">
         <div className="flex items-start gap-4">
-          <div className="w-14 h-14 rounded-xl bg-slate-100 flex items-center justify-center flex-shrink-0">
-            <FileText className="w-7 h-7 text-slate-500" />
+          <div
+            className="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0"
+            style={{ background: 'var(--bg-muted)' }}
+          >
+            <LordIcon name="system-regular-69-document-scan-hover-scan" size={28} trigger="hover" />
           </div>
           <div>
             <div className="flex items-center gap-3 mb-1">
-              <h1 className="text-xl font-bold text-slate-900">{doc.title}</h1>
+              <h1 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>
+                {doc.title}
+              </h1>
               <StatusBadge status={doc.status} />
             </div>
-            <p className="text-sm text-slate-500">
-              {DOCUMENT_TYPE_LABELS[doc.type]} &middot; {doc.fileName} &middot;{' '}
-              {formatSize(doc.fileSize)}
+            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+              {DOCUMENT_TYPE_LABELS[doc.type]} &middot; {doc.fileName} &middot; {formatSize(doc.fileSize)}
               {doc.version > 1 && (
-                <span className="ml-2 px-1.5 py-0.5 bg-slate-100 rounded text-xs">
-                  Version {doc.version}
-                </span>
+                <span className="badge badge--neutral ml-2">Version {doc.version}</span>
               )}
             </p>
           </div>
@@ -133,35 +131,48 @@ export default function DocumentView() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main content */}
+        {/* Main */}
         <div className="lg:col-span-2 space-y-6">
           {/* Rejection notice */}
           {doc.status === 'needs_correction' && doc.rejectionNote && (
-            <div className="bg-red-50 border border-red-200 rounded-xl p-4">
-              <div className="flex items-start gap-3">
-                <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-sm font-semibold text-red-800">Correction Required</p>
-                  <p className="text-sm text-red-700 mt-1">{doc.rejectionNote}</p>
-                </div>
+            <div
+              className="rounded-lg p-4 flex items-start gap-3"
+              style={{ background: 'var(--error-bg)', border: '1px solid #FECACA' }}
+            >
+              <LordIcon name="system-regular-52-wrong-file-hover-wrong-file-1" size={20} trigger="loop" />
+              <div>
+                <p className="text-sm font-semibold" style={{ color: 'var(--error-text)' }}>
+                  Correction Required
+                </p>
+                <p className="text-sm mt-1" style={{ color: '#B91C1C' }}>{doc.rejectionNote}</p>
               </div>
             </div>
           )}
 
-          {/* Document preview placeholder */}
-          <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-            <div className="px-5 py-3 border-b border-slate-100 flex items-center justify-between">
-              <span className="text-sm font-medium text-slate-700">Document Preview</span>
-              <button className="flex items-center gap-1.5 text-xs text-indigo-600 hover:text-indigo-800 font-medium">
+          {/* Document preview */}
+          <div className="cmd-card overflow-hidden">
+            <div
+              className="px-5 py-3 flex items-center justify-between"
+              style={{ borderBottom: '1px solid var(--border-default)' }}
+            >
+              <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                Document Preview
+              </span>
+              <button className="btn btn--ghost text-xs" style={{ color: 'var(--accent-500)' }}>
                 <Download className="w-3.5 h-3.5" />
                 Download
               </button>
             </div>
-            <div className="h-80 bg-slate-50 flex items-center justify-center">
+            <div
+              className="h-80 flex items-center justify-center"
+              style={{ background: 'var(--bg-muted)' }}
+            >
               <div className="text-center">
-                <FileText className="w-16 h-16 text-slate-300 mx-auto mb-3" />
-                <p className="text-sm text-slate-400">{doc.fileName}</p>
-                <p className="text-xs text-slate-300 mt-1">PDF preview available in production</p>
+                <LordIcon name="system-regular-69-document-scan-hover-scan" size={64} trigger="loop" />
+                <p className="text-sm mt-3" style={{ color: 'var(--text-muted)' }}>{doc.fileName}</p>
+                <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
+                  PDF preview available in production
+                </p>
               </div>
             </div>
           </div>
@@ -169,41 +180,38 @@ export default function DocumentView() {
           {/* Actions */}
           <div className="flex items-center gap-3">
             {canApprove && (
-              <button
-                onClick={handleApprove}
-                className="flex items-center gap-2 bg-emerald-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors"
-              >
-                <CheckCircle2 className="w-4 h-4" />
+              <button onClick={handleApprove} className="btn btn--success">
+                <LordIcon
+                  name="system-regular-31-check-hover-pinch"
+                  size={16}
+                  trigger="click"
+                  style={{ filter: 'brightness(0) invert(1)' }}
+                />
                 Approve Document
               </button>
             )}
 
             {canReject && !showRejectForm && (
-              <button
-                onClick={() => setShowRejectForm(true)}
-                className="flex items-center gap-2 bg-white text-red-600 border border-red-200 px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-red-50 transition-colors"
-              >
-                <XCircle className="w-4 h-4" />
+              <button onClick={() => setShowRejectForm(true)} className="btn btn--danger">
+                <LordIcon name="system-regular-52-wrong-file-hover-wrong-file-1" size={16} trigger="click" />
                 Reject
               </button>
             )}
 
             {canResubmit && (
-              <button
-                onClick={handleResubmit}
-                className="flex items-center gap-2 bg-indigo-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors"
-              >
-                <Upload className="w-4 h-4" />
+              <button onClick={handleResubmit} className="btn btn--primary">
+                <LordIcon
+                  name="system-regular-49-upload-file-hover-upload-1"
+                  size={16}
+                  trigger="click"
+                  style={{ filter: 'brightness(0) invert(1)' }}
+                />
                 Replace & Resubmit
               </button>
             )}
 
             {canDelete && (
-              <button
-                onClick={handleDelete}
-                className="flex items-center gap-2 text-slate-400 hover:text-red-600 px-3 py-2.5 rounded-lg text-sm transition-colors ml-auto"
-              >
-                <Trash2 className="w-4 h-4" />
+              <button onClick={handleDelete} className="btn btn--ghost ml-auto" style={{ color: 'var(--text-muted)' }}>
                 Delete
               </button>
             )}
@@ -211,29 +219,30 @@ export default function DocumentView() {
 
           {/* Reject form */}
           {showRejectForm && (
-            <div className="bg-white rounded-xl border border-red-200 p-5">
-              <p className="text-sm font-semibold text-slate-900 mb-3">Rejection Note</p>
+            <div className="cmd-card p-5" style={{ borderColor: '#FECACA' }}>
+              <p className="text-sm font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>
+                Rejection Note
+              </p>
               <textarea
                 value={rejectNote}
                 onChange={(e) => setRejectNote(e.target.value)}
                 placeholder="Explain what needs to be corrected..."
-                className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:border-red-500 focus:ring-2 focus:ring-red-500/20 outline-none transition text-sm resize-none"
+                className="fd-input"
                 rows={3}
+                style={{ resize: 'none' }}
               />
               <div className="flex items-center gap-3 mt-3">
                 <button
                   onClick={handleReject}
                   disabled={!rejectNote.trim()}
-                  className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition-colors disabled:opacity-50"
+                  className="btn btn--danger"
+                  style={{ opacity: !rejectNote.trim() ? 0.5 : 1 }}
                 >
                   Confirm Rejection
                 </button>
                 <button
-                  onClick={() => {
-                    setShowRejectForm(false)
-                    setRejectNote('')
-                  }}
-                  className="text-sm text-slate-500 hover:text-slate-700"
+                  onClick={() => { setShowRejectForm(false); setRejectNote('') }}
+                  className="btn btn--ghost"
                 >
                   Cancel
                 </button>
@@ -245,55 +254,70 @@ export default function DocumentView() {
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Metadata */}
-          <div className="bg-white rounded-xl border border-slate-200 p-5">
-            <h3 className="text-sm font-semibold text-slate-900 mb-4">Details</h3>
+          <div className="cmd-card p-5">
+            <h3 className="text-sm font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
+              Details
+            </h3>
             <div className="space-y-3">
               <div className="flex items-center gap-3 text-sm">
-                <Tag className="w-4 h-4 text-slate-400 flex-shrink-0" />
-                <span className="text-slate-500">Type</span>
-                <span className="ml-auto text-slate-900 font-medium">
+                <Tag className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--text-muted)' }} />
+                <span style={{ color: 'var(--text-secondary)' }}>Type</span>
+                <span className="ml-auto font-medium" style={{ color: 'var(--text-primary)' }}>
                   {DOCUMENT_TYPE_LABELS[doc.type]}
                 </span>
               </div>
               <div className="flex items-center gap-3 text-sm">
-                <User className="w-4 h-4 text-slate-400 flex-shrink-0" />
-                <span className="text-slate-500">Related Party</span>
-                <span className="ml-auto text-slate-900 font-medium">{doc.relatedParty}</span>
+                <User className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--text-muted)' }} />
+                <span style={{ color: 'var(--text-secondary)' }}>Related Party</span>
+                <span className="ml-auto font-medium" style={{ color: 'var(--text-primary)' }}>
+                  {doc.relatedParty}
+                </span>
               </div>
               <div className="flex items-center gap-3 text-sm">
-                <Calendar className="w-4 h-4 text-slate-400 flex-shrink-0" />
-                <span className="text-slate-500">Date</span>
-                <span className="ml-auto text-slate-900 font-medium">{doc.date}</span>
+                <Calendar className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--text-muted)' }} />
+                <span style={{ color: 'var(--text-secondary)' }}>Date</span>
+                <span className="ml-auto font-medium" style={{ color: 'var(--text-primary)' }}>
+                  {doc.date}
+                </span>
               </div>
               <div className="flex items-center gap-3 text-sm">
-                <User className="w-4 h-4 text-slate-400 flex-shrink-0" />
-                <span className="text-slate-500">Uploaded by</span>
-                <span className="ml-auto text-slate-900 font-medium">{doc.uploadedBy.name}</span>
+                <User className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--text-muted)' }} />
+                <span style={{ color: 'var(--text-secondary)' }}>Uploaded by</span>
+                <span className="ml-auto font-medium" style={{ color: 'var(--text-primary)' }}>
+                  {doc.uploadedBy.name}
+                </span>
               </div>
               <div className="flex items-center gap-3 text-sm">
-                <Clock className="w-4 h-4 text-slate-400 flex-shrink-0" />
-                <span className="text-slate-500">Uploaded</span>
-                <span className="ml-auto text-slate-900 text-xs">{formatDate(doc.uploadedAt)}</span>
+                <Clock className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--text-muted)' }} />
+                <span style={{ color: 'var(--text-secondary)' }}>Uploaded</span>
+                <span className="ml-auto text-xs" style={{ color: 'var(--text-primary)' }}>
+                  {formatDate(doc.uploadedAt)}
+                </span>
               </div>
               {doc.source === 'webhook' && (
                 <div className="flex items-center gap-3 text-sm">
-                  <Webhook className="w-4 h-4 text-indigo-400 flex-shrink-0" />
-                  <span className="text-indigo-600 font-medium">Received via webhook</span>
+                  <Webhook className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--accent-500)' }} />
+                  <span className="font-medium" style={{ color: 'var(--accent-500)' }}>
+                    Received via webhook
+                  </span>
                 </div>
               )}
               {doc.approvedBy && (
-                <div className="flex items-center gap-3 text-sm pt-2 border-t border-slate-100">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                  <span className="text-slate-500">Approved by</span>
-                  <span className="ml-auto text-emerald-700 font-medium">
+                <div
+                  className="flex items-center gap-3 text-sm pt-2"
+                  style={{ borderTop: '1px solid var(--border-default)' }}
+                >
+                  <LordIcon name="system-regular-31-check-hover-pinch" size={16} trigger="hover" />
+                  <span style={{ color: 'var(--text-secondary)' }}>Approved by</span>
+                  <span className="ml-auto font-medium" style={{ color: 'var(--success-text)' }}>
                     {doc.approvedBy.name}
                   </span>
                 </div>
               )}
               {doc.webhookTriggered && (
                 <div className="flex items-center gap-3 text-sm">
-                  <Webhook className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                  <span className="text-emerald-600 text-xs font-medium">
+                  <Webhook className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--success)' }} />
+                  <span className="text-xs font-medium" style={{ color: 'var(--success-text)' }}>
                     Archive webhook sent
                   </span>
                 </div>
@@ -302,31 +326,27 @@ export default function DocumentView() {
           </div>
 
           {/* Audit trail */}
-          <div className="bg-white rounded-xl border border-slate-200 p-5">
-            <h3 className="text-sm font-semibold text-slate-900 mb-4 flex items-center gap-2">
-              <History className="w-4 h-4 text-slate-400" />
+          <div className="cmd-card p-5">
+            <h3 className="text-sm font-semibold mb-4 flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
+              <LordIcon name="system-regular-78-check-list-hover-check-list" size={16} trigger="hover" />
               Audit Trail
             </h3>
             <div className="space-y-0">
               {doc.history.map((event, i) => (
                 <div key={event.id} className="flex gap-3">
                   <div className="flex flex-col items-center">
-                    <div
-                      className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${
-                        i === 0 ? 'bg-indigo-500' : 'bg-slate-300'
-                      }`}
-                    />
-                    {i < doc.history.length - 1 && (
-                      <div className="w-px flex-1 bg-slate-200 my-1" />
-                    )}
+                    <div className={`mt-2 flex-shrink-0 ${i === 0 ? 'audit-dot' : 'audit-dot audit-dot--muted'}`} />
+                    {i < doc.history.length - 1 && <div className="audit-line flex-1 my-1" />}
                   </div>
                   <div className="pb-4">
-                    <p className="text-sm text-slate-900">{event.action}</p>
-                    <p className="text-xs text-slate-400 mt-0.5">
+                    <p className="text-sm" style={{ color: 'var(--text-primary)' }}>{event.action}</p>
+                    <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
                       {event.user} &middot; {formatDate(event.timestamp)}
                     </p>
                     {event.note && (
-                      <p className="text-xs text-red-600 mt-1 italic">"{event.note}"</p>
+                      <p className="text-xs mt-1 italic" style={{ color: 'var(--error-text)' }}>
+                        "{event.note}"
+                      </p>
                     )}
                   </div>
                 </div>

@@ -1,11 +1,31 @@
 import { useState, useMemo } from 'react'
-import { Search, FileText, SlidersHorizontal } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { Search } from 'lucide-react'
+import LordIcon from '@/shared/components/LordIcon'
 import { mockGetDocuments } from '@/mock/data'
 import type { DocumentStatus, DocumentType } from '@/types'
 import { STATUS_LABELS, DOCUMENT_TYPE_LABELS } from '@/types'
-import DocumentCard from '@/components/DocumentCard'
+import StatusBadge from '@/components/StatusBadge'
+
+function timeAgo(dateStr: string) {
+  const diff = Date.now() - new Date(dateStr).getTime()
+  const mins = Math.floor(diff / 60000)
+  if (mins < 1) return 'just now'
+  if (mins < 60) return `${mins}m ago`
+  const hrs = Math.floor(mins / 60)
+  if (hrs < 24) return `${hrs}h ago`
+  const days = Math.floor(hrs / 24)
+  return `${days}d ago`
+}
+
+function formatSize(bytes: number) {
+  if (bytes < 1024) return `${bytes} B`
+  if (bytes < 1048576) return `${(bytes / 1024).toFixed(1)} KB`
+  return `${(bytes / 1048576).toFixed(1)} MB`
+}
 
 export default function Documents() {
+  const navigate = useNavigate()
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<DocumentStatus | ''>('')
   const [typeFilter, setTypeFilter] = useState<DocumentType | ''>('')
@@ -22,61 +42,102 @@ export default function Documents() {
 
   return (
     <div className="max-w-6xl mx-auto">
-      <h1 className="text-2xl font-bold text-slate-900 mb-1">All Documents</h1>
-      <p className="text-sm text-slate-500 mb-6">
+      <h1 className="text-2xl font-bold mb-1" style={{ color: 'var(--text-primary)' }}>
+        All Documents
+      </h1>
+      <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>
         Search and filter all documents in the system.
       </p>
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3 mb-6">
         <div className="relative flex-1 min-w-[240px]">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search
+            className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2"
+            style={{ color: 'var(--text-muted)' }}
+          />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by title, party, or filename..."
-            className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition text-sm"
+            className="fd-input"
+            style={{ paddingLeft: 36 }}
           />
         </div>
-        <div className="flex items-center gap-2">
-          <SlidersHorizontal className="w-4 h-4 text-slate-400" />
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as DocumentStatus | '')}
-            className="px-3 py-2.5 rounded-lg border border-slate-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition text-sm bg-white"
-          >
-            <option value="">All Statuses</option>
-            {Object.entries(STATUS_LABELS).map(([key, label]) => (
-              <option key={key} value={key}>{label}</option>
-            ))}
-          </select>
-          <select
-            value={typeFilter}
-            onChange={(e) => setTypeFilter(e.target.value as DocumentType | '')}
-            className="px-3 py-2.5 rounded-lg border border-slate-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition text-sm bg-white"
-          >
-            <option value="">All Types</option>
-            {Object.entries(DOCUMENT_TYPE_LABELS).map(([key, label]) => (
-              <option key={key} value={key}>{label}</option>
-            ))}
-          </select>
-        </div>
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value as DocumentStatus | '')}
+          className="fd-select"
+        >
+          <option value="">All Statuses</option>
+          {Object.entries(STATUS_LABELS).map(([key, label]) => (
+            <option key={key} value={key}>{label}</option>
+          ))}
+        </select>
+        <select
+          value={typeFilter}
+          onChange={(e) => setTypeFilter(e.target.value as DocumentType | '')}
+          className="fd-select"
+        >
+          <option value="">All Types</option>
+          {Object.entries(DOCUMENT_TYPE_LABELS).map(([key, label]) => (
+            <option key={key} value={key}>{label}</option>
+          ))}
+        </select>
       </div>
 
-      <p className="text-xs text-slate-400 mb-4">{documents.length} document{documents.length !== 1 ? 's' : ''}</p>
+      <p className="text-xs mb-4" style={{ color: 'var(--text-muted)' }}>
+        {documents.length} document{documents.length !== 1 ? 's' : ''}
+      </p>
 
-      {/* Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {documents.map((doc) => (
-          <DocumentCard key={doc.id} doc={doc} />
-        ))}
+      {/* Data table */}
+      <div className="cmd-card overflow-hidden">
+        <table className="cmd-table">
+          <thead>
+            <tr>
+              <th>Document</th>
+              <th>Type</th>
+              <th>Status</th>
+              <th>Related Party</th>
+              <th>Size</th>
+              <th>Updated</th>
+            </tr>
+          </thead>
+          <tbody>
+            {documents.map((doc) => (
+              <tr
+                key={doc.id}
+                onClick={() => navigate(`/documents/${doc.id}`)}
+              >
+                <td>
+                  <div className="flex items-center gap-3">
+                    <LordIcon name="system-regular-69-document-scan-hover-scan" size={16} trigger="hover" />
+                    <div>
+                      <p className="font-medium" style={{ color: 'var(--text-primary)' }}>{doc.title}</p>
+                      <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{doc.fileName}</p>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                    {DOCUMENT_TYPE_LABELS[doc.type]}
+                  </span>
+                </td>
+                <td><StatusBadge status={doc.status} /></td>
+                <td style={{ color: 'var(--text-secondary)' }}>{doc.relatedParty}</td>
+                <td style={{ color: 'var(--text-muted)' }}>{formatSize(doc.fileSize)}</td>
+                <td style={{ color: 'var(--text-muted)' }}>{timeAgo(doc.updatedAt)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       {documents.length === 0 && (
         <div className="text-center py-16">
-          <FileText className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-          <p className="text-slate-500">No documents match your filters</p>
+          <LordIcon name="system-regular-69-document-scan-hover-scan" size={48} trigger="loop" />
+          <p className="mt-3" style={{ color: 'var(--text-muted)' }}>No documents match your filters</p>
         </div>
       )}
     </div>

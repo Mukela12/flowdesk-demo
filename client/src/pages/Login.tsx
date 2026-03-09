@@ -1,7 +1,10 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
-import { FileText, Eye, EyeOff, ArrowRight } from 'lucide-react'
+import RiveCursorTracker from '@/shared/components/RiveCursorTracker'
+import { useMousePosition } from '@/shared/hooks/useMousePosition'
+import LordIcon from '@/shared/components/LordIcon'
+import { Eye, EyeOff, ArrowRight } from 'lucide-react'
 
 const DEMO_CREDENTIALS = [
   { role: 'Manager', email: 'manager@flowdesk.io', password: 'demo123' },
@@ -16,6 +19,7 @@ export default function Login() {
   const [error, setError] = useState('')
   const { login } = useAuth()
   const navigate = useNavigate()
+  const { x: mouseX, y: mouseY } = useMousePosition()
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -36,98 +40,115 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex">
-      {/* Left panel */}
-      <div className="hidden lg:flex lg:w-1/2 bg-indigo-600 p-12 flex-col justify-between relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-20 -left-10 w-72 h-72 rounded-full bg-white" />
-          <div className="absolute bottom-20 right-10 w-96 h-96 rounded-full bg-white" />
+    <div data-theme="flowdesk" className="min-h-screen flex" style={{ backgroundColor: 'var(--bg-base)' }}>
+      {/* Left panel — Rive Animation */}
+      <div
+        className="hidden lg:flex lg:w-[480px] xl:w-[540px] flex-col relative overflow-hidden"
+        style={{ backgroundColor: 'var(--sidebar-bg)' }}
+      >
+        {/* Decorative gradient */}
+        <div className="absolute inset-0 opacity-20" style={{
+          background: 'radial-gradient(circle at 30% 40%, var(--accent-500) 0%, transparent 60%)',
+        }} />
+
+        {/* Logo */}
+        <div className="relative px-8 pt-8 flex items-center gap-3">
+          <div
+            className="w-9 h-9 rounded-lg flex items-center justify-center"
+            style={{ background: 'var(--accent-500)' }}
+          >
+            <LordIcon
+              name="system-regular-69-document-scan-hover-scan"
+              size={20}
+              trigger="loop"
+              style={{ filter: 'brightness(0) invert(1)' }}
+            />
+          </div>
+          <span className="text-xl font-semibold tracking-tight" style={{ color: '#F8FAFC' }}>
+            FlowDesk
+          </span>
         </div>
 
-        <div className="relative">
-          <div className="flex items-center gap-3 mb-12">
-            <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
-              <FileText className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-white text-xl font-semibold tracking-tight">FlowDesk</span>
-          </div>
-          <h1 className="text-4xl font-bold text-white leading-tight mb-4">
+        {/* Rive character */}
+        <div className="flex-1 flex items-center justify-center px-8">
+          <RiveCursorTracker
+            src="/animations/rive/blue-guy.riv"
+            mouseX={mouseX}
+            mouseY={mouseY}
+            className="w-[320px] h-[320px]"
+          />
+        </div>
+
+        {/* Bottom text */}
+        <div className="relative px-8 pb-8">
+          <h2 className="text-2xl font-semibold mb-2" style={{ color: '#F8FAFC' }}>
             Document Approval
-            <br />
-            Made Simple
-          </h1>
-          <p className="text-indigo-200 text-lg max-w-md">
-            Upload, review, approve, and archive documents through a streamlined workflow — with
-            full audit trail and webhook integrations.
+            <br />Made Simple
+          </h2>
+          <p className="text-sm" style={{ color: 'var(--sidebar-text)' }}>
+            Upload, review, approve, and archive documents with full audit trail and webhook integrations.
           </p>
-        </div>
-
-        <div className="relative space-y-6">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center text-white text-sm font-mono">01</div>
-            <div>
-              <p className="text-white font-medium">Upload & Metadata</p>
-              <p className="text-indigo-300 text-sm">Accountants upload documents with type, date, and party info</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center text-white text-sm font-mono">02</div>
-            <div>
-              <p className="text-white font-medium">Review & Approve</p>
-              <p className="text-indigo-300 text-sm">Manager approves or rejects with correction notes</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center text-white text-sm font-mono">03</div>
-            <div>
-              <p className="text-white font-medium">Archive via Webhook</p>
-              <p className="text-indigo-300 text-sm">Approved docs trigger outbound webhooks to n8n/Paperless-ngx</p>
-            </div>
-          </div>
         </div>
       </div>
 
-      {/* Right panel */}
+      {/* Right panel — Login Form */}
       <div className="flex-1 flex items-center justify-center p-6">
-        <div className="w-full max-w-md">
+        <div className="w-full max-w-[400px]">
+          {/* Mobile logo */}
           <div className="lg:hidden flex items-center gap-3 mb-8">
-            <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center">
-              <FileText className="w-5 h-5 text-white" />
+            <div
+              className="w-9 h-9 rounded-lg flex items-center justify-center"
+              style={{ background: 'var(--accent-500)' }}
+            >
+              <LordIcon
+                name="system-regular-69-document-scan-hover-scan"
+                size={20}
+                trigger="hover"
+                style={{ filter: 'brightness(0) invert(1)' }}
+              />
             </div>
-            <span className="text-slate-900 text-xl font-semibold tracking-tight">FlowDesk</span>
+            <span className="text-xl font-semibold tracking-tight" style={{ color: 'var(--text-primary)' }}>
+              FlowDesk
+            </span>
           </div>
 
-          <h2 className="text-2xl font-bold text-slate-900 mb-1">Welcome back</h2>
-          <p className="text-slate-500 mb-8">Sign in to your account to continue</p>
+          <h2 className="text-2xl font-bold mb-1" style={{ color: 'var(--text-primary)' }}>
+            Welcome back
+          </h2>
+          <p className="text-sm mb-8" style={{ color: 'var(--text-secondary)' }}>
+            Sign in to your account to continue
+          </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Email</label>
+              <label className="fd-label">Email</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
-                className="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition text-sm"
+                className="fd-input"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Password</label>
+              <label className="fd-label">Password</label>
               <div className="relative">
                 <input
                   type={showPass ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  className="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition text-sm pr-10"
+                  className="fd-input"
+                  style={{ paddingRight: 40 }}
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPass(!showPass)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2"
+                  style={{ color: 'var(--text-muted)' }}
                 >
                   {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -135,21 +156,29 @@ export default function Login() {
             </div>
 
             {error && (
-              <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">{error}</p>
+              <p
+                className="text-sm px-3 py-2 rounded-lg"
+                style={{ background: 'var(--error-bg)', color: 'var(--error-text)' }}
+              >
+                {error}
+              </p>
             )}
 
-            <button
-              type="submit"
-              className="w-full bg-indigo-600 text-white py-2.5 rounded-lg font-medium text-sm hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2"
-            >
+            <button type="submit" className="btn btn--primary w-full py-2.5">
               Sign in
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>
 
           {/* Demo credentials */}
-          <div className="mt-8 p-4 bg-slate-100 rounded-xl">
-            <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-3">
+          <div
+            className="mt-8 p-4 rounded-lg"
+            style={{ background: 'var(--bg-muted)', border: '1px solid var(--border-default)' }}
+          >
+            <p
+              className="text-[10px] font-semibold uppercase tracking-wider mb-3"
+              style={{ color: 'var(--text-muted)' }}
+            >
               Demo Accounts
             </p>
             <div className="space-y-2">
@@ -157,19 +186,22 @@ export default function Login() {
                 <button
                   key={cred.email}
                   onClick={() => quickLogin(cred)}
-                  className="w-full flex items-center justify-between px-3 py-2.5 bg-white rounded-lg border border-slate-200 hover:border-indigo-300 hover:shadow-sm transition-all text-left group"
+                  className="cmd-card w-full flex items-center justify-between px-3 py-2.5 text-left group"
+                  style={{ cursor: 'pointer' }}
                 >
                   <div>
-                    <p className="text-sm font-medium text-slate-700 group-hover:text-indigo-700 transition-colors">
+                    <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                       {cred.role}
                     </p>
-                    <p className="text-xs text-slate-400 font-mono">{cred.email}</p>
+                    <p className="text-xs font-mono" style={{ color: 'var(--text-muted)' }}>
+                      {cred.email}
+                    </p>
                   </div>
-                  <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-indigo-500 transition-colors" />
+                  <ArrowRight className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
                 </button>
               ))}
             </div>
-            <p className="text-xs text-slate-400 mt-3 text-center">
+            <p className="text-xs mt-3 text-center" style={{ color: 'var(--text-muted)' }}>
               Password: <span className="font-mono">demo123</span>
             </p>
           </div>

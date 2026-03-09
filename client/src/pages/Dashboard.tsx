@@ -1,19 +1,25 @@
 import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import {
-  FileText,
-  Clock,
-  CheckCircle2,
-  AlertTriangle,
-  Archive,
-  ArrowUpRight,
-  Filter,
-  Upload,
-} from 'lucide-react'
+import { ArrowUpRight } from 'lucide-react'
+import LordIcon from '@/shared/components/LordIcon'
 import { useAuth } from '@/context/AuthContext'
 import { mockGetDocuments, mockGetStats } from '@/mock/data'
 import type { DocumentStatus } from '@/types'
 import DocumentCard from '@/components/DocumentCard'
+
+const statIcons: Record<string, string> = {
+  pending_review: 'system-regular-78-check-list-hover-check-list',
+  needs_correction: 'system-regular-52-wrong-file-hover-wrong-file-1',
+  approved: 'system-regular-31-check-hover-pinch',
+  archived: 'system-regular-69-document-scan-hover-scan',
+}
+
+const statBadgeClass: Record<string, string> = {
+  pending_review: 'badge--warning',
+  needs_correction: 'badge--error',
+  approved: 'badge--success',
+  archived: 'badge--neutral',
+}
 
 export default function Dashboard() {
   const { user, isManager, isAccountant } = useAuth()
@@ -27,38 +33,10 @@ export default function Dashboard() {
   )
 
   const statCards = [
-    {
-      label: 'Pending Review',
-      value: stats.pendingReview,
-      icon: Clock,
-      color: 'text-amber-600',
-      bg: 'bg-amber-50',
-      filter: 'pending_review' as DocumentStatus,
-    },
-    {
-      label: 'Needs Correction',
-      value: stats.needsCorrection,
-      icon: AlertTriangle,
-      color: 'text-red-600',
-      bg: 'bg-red-50',
-      filter: 'needs_correction' as DocumentStatus,
-    },
-    {
-      label: 'Approved',
-      value: stats.approved,
-      icon: CheckCircle2,
-      color: 'text-emerald-600',
-      bg: 'bg-emerald-50',
-      filter: 'approved' as DocumentStatus,
-    },
-    {
-      label: 'Archived',
-      value: stats.archived,
-      icon: Archive,
-      color: 'text-slate-600',
-      bg: 'bg-slate-100',
-      filter: 'archived' as DocumentStatus,
-    },
+    { label: 'Pending Review', value: stats.pendingReview, key: 'pending_review' as DocumentStatus },
+    { label: 'Needs Correction', value: stats.needsCorrection, key: 'needs_correction' as DocumentStatus },
+    { label: 'Approved', value: stats.approved, key: 'approved' as DocumentStatus },
+    { label: 'Archived', value: stats.archived, key: 'archived' as DocumentStatus },
   ]
 
   return (
@@ -66,62 +44,69 @@ export default function Dashboard() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">
+          <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
             {isManager ? 'Manager Dashboard' : 'Dashboard'}
           </h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>
             Welcome back, {user?.name?.split(' ')[0]}. Here's your document overview.
           </p>
         </div>
         {isAccountant && (
-          <button
-            onClick={() => navigate('/upload')}
-            className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors"
-          >
-            <Upload className="w-4 h-4" />
+          <button onClick={() => navigate('/upload')} className="btn btn--primary">
+            <LordIcon
+              name="system-regular-49-upload-file-hover-upload-1"
+              size={16}
+              trigger="hover"
+              style={{ filter: 'brightness(0) invert(1)' }}
+            />
             Upload Document
           </button>
         )}
       </div>
 
-      {/* Stats */}
+      {/* Stat cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {statCards.map((stat) => (
           <button
-            key={stat.label}
-            onClick={() => setStatusFilter(statusFilter === stat.filter ? 'all' : stat.filter)}
-            className={`p-5 rounded-xl border transition-all text-left ${
-              statusFilter === stat.filter
-                ? 'border-indigo-300 bg-white shadow-md ring-2 ring-indigo-500/20'
-                : 'border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm'
+            key={stat.key}
+            onClick={() => setStatusFilter(statusFilter === stat.key ? 'all' : stat.key)}
+            className={`cmd-card cmd-stat text-left transition-all ${
+              statusFilter === stat.key ? 'ring-2' : ''
             }`}
+            style={{
+              ...(statusFilter === stat.key ? { borderColor: 'var(--accent-500)', ringColor: 'var(--accent-500)' } : {}),
+              boxShadow: statusFilter === stat.key ? '0 0 0 2px rgba(59,130,246,0.2)' : undefined,
+            }}
           >
             <div className="flex items-center justify-between mb-3">
-              <div className={`w-10 h-10 rounded-lg ${stat.bg} flex items-center justify-center`}>
-                <stat.icon className={`w-5 h-5 ${stat.color}`} />
+              <div
+                className="w-10 h-10 rounded-lg flex items-center justify-center"
+                style={{ background: 'var(--bg-muted)' }}
+              >
+                <LordIcon name={statIcons[stat.key]} size={20} trigger="hover" />
               </div>
               {stat.value > 0 && (
-                <ArrowUpRight className="w-4 h-4 text-slate-300" />
+                <ArrowUpRight className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />
               )}
             </div>
-            <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
-            <p className="text-xs text-slate-500 mt-0.5">{stat.label}</p>
+            <p className="cmd-stat__value">{stat.value}</p>
+            <p className="cmd-stat__label">{stat.label}</p>
           </button>
         ))}
       </div>
 
-      {/* Filter bar */}
+      {/* Filter info */}
       <div className="flex items-center gap-3 mb-4">
-        <Filter className="w-4 h-4 text-slate-400" />
-        <span className="text-sm text-slate-500">
+        <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
           {statusFilter === 'all'
             ? `All documents (${stats.total})`
-            : `Filtered: ${statCards.find((s) => s.filter === statusFilter)?.label} (${documents.length})`}
+            : `Filtered: ${statCards.find((s) => s.key === statusFilter)?.label} (${documents.length})`}
         </span>
         {statusFilter !== 'all' && (
           <button
             onClick={() => setStatusFilter('all')}
-            className="text-xs text-indigo-600 hover:text-indigo-800 font-medium"
+            className="text-xs font-medium"
+            style={{ color: 'var(--accent-500)' }}
           >
             Clear filter
           </button>
@@ -137,8 +122,8 @@ export default function Dashboard() {
 
       {documents.length === 0 && (
         <div className="text-center py-16">
-          <FileText className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-          <p className="text-slate-500">No documents found</p>
+          <LordIcon name="system-regular-69-document-scan-hover-scan" size={48} trigger="loop" />
+          <p className="mt-3" style={{ color: 'var(--text-muted)' }}>No documents found</p>
         </div>
       )}
     </div>
