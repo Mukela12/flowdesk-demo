@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { Fragment, useMemo, useState } from 'react'
 import {
   ArrowDownLeft,
   ArrowUpRight,
@@ -105,9 +105,8 @@ export default function Webhooks() {
           </thead>
           <tbody>
             {logs.map((log) => (
-              <>
+              <Fragment key={log.id}>
                 <tr
-                  key={log.id}
                   onClick={() => setExpandedId(expandedId === log.id ? null : log.id)}
                 >
                   <td>
@@ -180,7 +179,7 @@ export default function Webhooks() {
                     </td>
                   </tr>
                 )}
-              </>
+              </Fragment>
             ))}
           </tbody>
         </table>

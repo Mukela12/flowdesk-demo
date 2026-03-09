@@ -72,7 +72,7 @@ export default function Login() {
         {/* Rive character */}
         <div className="flex-1 flex items-center justify-center px-8">
           <RiveCursorTracker
-            src="/animations/rive/blue-guy.riv"
+            src="/animations/rive/look-login.riv"
             mouseX={mouseX}
             mouseY={mouseY}
             className="w-[320px] h-[320px]"
