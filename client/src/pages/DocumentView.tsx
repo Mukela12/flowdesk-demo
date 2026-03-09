@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import {
   ArrowLeft,
@@ -8,16 +8,12 @@ import {
   Tag,
   Webhook,
   Clock,
+  Loader2,
 } from 'lucide-react'
 import LordIcon from '@/shared/components/LordIcon'
 import { useAuth } from '@/context/AuthContext'
-import {
-  mockGetDocument,
-  mockApproveDocument,
-  mockRejectDocument,
-  mockResubmitDocument,
-  mockDeleteDocument,
-} from '@/mock/data'
+import { documentsApi } from '@/api/documents'
+import type { Document } from '@/types'
 import { DOCUMENT_TYPE_LABELS } from '@/types'
 import StatusBadge from '@/components/StatusBadge'
 
@@ -41,11 +37,33 @@ export default function DocumentView() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { user, isManager, isAccountant } = useAuth()
+  const [doc, setDoc] = useState<Document | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [actionLoading, setActionLoading] = useState(false)
   const [rejectNote, setRejectNote] = useState('')
   const [showRejectForm, setShowRejectForm] = useState(false)
-  const [, forceUpdate] = useState(0)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const doc = useMemo(() => mockGetDocument(id!), [id, forceUpdate])
+  const fetchDoc = () => {
+    setLoading(true)
+    documentsApi
+      .get(id!)
+      .then(setDoc)
+      .catch(() => setDoc(null))
+      .finally(() => setLoading(false))
+  }
+
+  useEffect(() => {
+    fetchDoc()
+  }, [id])
+
+  if (loading) {
+    return (
+      <div className="max-w-4xl mx-auto text-center py-16">
+        <div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin mx-auto" style={{ borderColor: 'var(--accent-500)', borderTopColor: 'transparent' }} />
+      </div>
+    )
+  }
 
   if (!doc) {
     return (
@@ -68,33 +86,73 @@ export default function DocumentView() {
   const canDelete = isManager
   const canResubmit = isAccountant && doc.status === 'needs_correction' && doc.uploadedBy.id === user?.id
 
-  const handleApprove = () => {
-    mockApproveDocument(doc.id)
-    forceUpdate((n) => n + 1)
+  const handleApprove = async () => {
+    setActionLoading(true)
+    try {
+      await documentsApi.approve(doc.id)
+      fetchDoc()
+    } catch (err) {
+      console.error('Approve failed', err)
+    } finally {
+      setActionLoading(false)
+    }
   }
 
-  const handleReject = () => {
+  const handleReject = async () => {
     if (!rejectNote.trim()) return
-    mockRejectDocument(doc.id, rejectNote.trim())
-    setShowRejectForm(false)
-    setRejectNote('')
-    forceUpdate((n) => n + 1)
+    setActionLoading(true)
+    try {
+      await documentsApi.reject(doc.id, rejectNote.trim())
+      setShowRejectForm(false)
+      setRejectNote('')
+      fetchDoc()
+    } catch (err) {
+      console.error('Reject failed', err)
+    } finally {
+      setActionLoading(false)
+    }
   }
 
-  const handleResubmit = () => {
-    mockResubmitDocument(doc.id, `${doc.fileName.replace('.pdf', '')}-v${doc.version + 1}.pdf`)
-    forceUpdate((n) => n + 1)
+  const handleResubmit = async (file?: File) => {
+    setActionLoading(true)
+    try {
+      await documentsApi.resubmit(doc.id, file)
+      fetchDoc()
+    } catch (err) {
+      console.error('Resubmit failed', err)
+    } finally {
+      setActionLoading(false)
+    }
   }
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (confirm('Are you sure you want to delete this document? This action cannot be undone.')) {
-      mockDeleteDocument(doc.id)
-      navigate('/dashboard')
+      setActionLoading(true)
+      try {
+        await documentsApi.delete(doc.id)
+        navigate('/dashboard')
+      } catch (err) {
+        console.error('Delete failed', err)
+        setActionLoading(false)
+      }
     }
   }
 
   return (
     <div className="max-w-4xl mx-auto">
+      {/* Hidden file input for resubmit */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        className="hidden"
+        accept=".pdf,.png,.jpg,.jpeg"
+        onChange={(e) => {
+          const f = e.target.files?.[0]
+          handleResubmit(f)
+          e.target.value = ''
+        }}
+      />
+
       {/* Back */}
       <button
         onClick={() => navigate(-1)}
@@ -158,10 +216,12 @@ export default function DocumentView() {
               <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                 Document Preview
               </span>
-              <button className="btn btn--ghost text-xs" style={{ color: 'var(--accent-500)' }}>
-                <Download className="w-3.5 h-3.5" />
-                Download
-              </button>
+              {doc.fileUrl && (
+                <a href={doc.fileUrl} target="_blank" rel="noopener noreferrer" className="btn btn--ghost text-xs" style={{ color: 'var(--accent-500)' }}>
+                  <Download className="w-3.5 h-3.5" />
+                  Download
+                </a>
+              )}
             </div>
             <div
               className="h-80 flex items-center justify-center"
@@ -170,9 +230,15 @@ export default function DocumentView() {
               <div className="text-center">
                 <LordIcon name="system-regular-69-document-scan-hover-scan" size={64} trigger="loop" />
                 <p className="text-sm mt-3" style={{ color: 'var(--text-muted)' }}>{doc.fileName}</p>
-                <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
-                  PDF preview available in production
-                </p>
+                {doc.fileUrl ? (
+                  <a href={doc.fileUrl} target="_blank" rel="noopener noreferrer" className="text-xs mt-1 inline-block" style={{ color: 'var(--accent-500)' }}>
+                    Open file in new tab
+                  </a>
+                ) : (
+                  <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
+                    No file available
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -180,38 +246,42 @@ export default function DocumentView() {
           {/* Actions */}
           <div className="flex items-center gap-3">
             {canApprove && (
-              <button onClick={handleApprove} className="btn btn--success">
-                <LordIcon
-                  name="system-regular-31-check-hover-pinch"
-                  size={16}
-                  trigger="click"
-                  style={{ filter: 'brightness(0) invert(1)' }}
-                />
+              <button onClick={handleApprove} disabled={actionLoading} className="btn btn--success">
+                {actionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : (
+                  <LordIcon
+                    name="system-regular-31-check-hover-pinch"
+                    size={16}
+                    trigger="click"
+                    style={{ filter: 'brightness(0) invert(1)' }}
+                  />
+                )}
                 Approve Document
               </button>
             )}
 
             {canReject && !showRejectForm && (
-              <button onClick={() => setShowRejectForm(true)} className="btn btn--danger">
+              <button onClick={() => setShowRejectForm(true)} disabled={actionLoading} className="btn btn--danger">
                 <LordIcon name="system-regular-52-wrong-file-hover-wrong-file-1" size={16} trigger="click" />
                 Reject
               </button>
             )}
 
             {canResubmit && (
-              <button onClick={handleResubmit} className="btn btn--primary">
-                <LordIcon
-                  name="system-regular-49-upload-file-hover-upload-1"
-                  size={16}
-                  trigger="click"
-                  style={{ filter: 'brightness(0) invert(1)' }}
-                />
+              <button onClick={() => fileInputRef.current?.click()} disabled={actionLoading} className="btn btn--primary">
+                {actionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : (
+                  <LordIcon
+                    name="system-regular-49-upload-file-hover-upload-1"
+                    size={16}
+                    trigger="click"
+                    style={{ filter: 'brightness(0) invert(1)' }}
+                  />
+                )}
                 Replace & Resubmit
               </button>
             )}
 
             {canDelete && (
-              <button onClick={handleDelete} className="btn btn--ghost ml-auto" style={{ color: 'var(--text-muted)' }}>
+              <button onClick={handleDelete} disabled={actionLoading} className="btn btn--ghost ml-auto" style={{ color: 'var(--text-muted)' }}>
                 Delete
               </button>
             )}
@@ -234,11 +304,11 @@ export default function DocumentView() {
               <div className="flex items-center gap-3 mt-3">
                 <button
                   onClick={handleReject}
-                  disabled={!rejectNote.trim()}
+                  disabled={!rejectNote.trim() || actionLoading}
                   className="btn btn--danger"
                   style={{ opacity: !rejectNote.trim() ? 0.5 : 1 }}
                 >
-                  Confirm Rejection
+                  {actionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Confirm Rejection'}
                 </button>
                 <button
                   onClick={() => { setShowRejectForm(false); setRejectNote('') }}

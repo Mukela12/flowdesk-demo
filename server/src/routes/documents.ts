@@ -1,23 +1,29 @@
 import { Router } from 'express'
 import multer from 'multer'
-import path from 'path'
-import { v4 as uuid } from 'uuid'
+import { v2 as cloudinary } from 'cloudinary'
+import { CloudinaryStorage } from 'multer-storage-cloudinary'
 import pool from '../db/pool.js'
 import { authMiddleware, requireManager, requireAccountant, type AuthRequest } from '../middleware/auth.js'
 
+// Cloudinary config
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+})
+
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: 'flowdesk',
+    resource_type: 'auto',
+    allowed_formats: ['pdf', 'png', 'jpg', 'jpeg'],
+  } as any,
+})
+
 const upload = multer({
-  storage: multer.diskStorage({
-    destination: 'uploads/',
-    filename: (_req, file, cb) => {
-      const ext = path.extname(file.originalname)
-      cb(null, `${uuid()}${ext}`)
-    },
-  }),
+  storage,
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
-  fileFilter: (_req, file, cb) => {
-    const allowed = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg']
-    cb(null, allowed.includes(file.mimetype))
-  },
 })
 
 const router = Router()
@@ -68,6 +74,7 @@ router.get('/', async (req: AuthRequest, res) => {
       date: row.date,
       fileName: row.file_name,
       fileSize: row.file_size,
+      fileUrl: row.file_path || null,
       source: row.source,
       version: row.version,
       rejectionNote: row.rejection_note,
@@ -145,6 +152,7 @@ router.get('/:id', async (req: AuthRequest, res) => {
       date: row.date,
       fileName: row.file_name,
       fileSize: row.file_size,
+      fileUrl: row.file_path || null,
       source: row.source,
       version: row.version,
       rejectionNote: row.rejection_note,
@@ -188,7 +196,7 @@ router.post('/', requireAccountant, upload.single('file'), async (req: AuthReque
       `INSERT INTO documents (title, type, related_party, date, file_name, file_size, file_path, uploaded_by, source)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'web_upload')
        RETURNING id`,
-      [title, type, relatedParty, date, file.originalname, file.size, file.path, req.userId]
+      [title, type, relatedParty, date, file.originalname, file.size, (file as any).path || (file as any).secure_url || '', req.userId]
     )
 
     const docId = docResult.rows[0].id
@@ -332,7 +340,7 @@ router.post('/:id/resubmit', requireAccountant, upload.single('file'), async (re
     const newVersion = docResult.rows[0].version + 1
     const fileName = file ? file.originalname : docResult.rows[0].file_name
     const fileSize = file ? file.size : docResult.rows[0].file_size
-    const filePath = file ? file.path : docResult.rows[0].file_path
+    const filePath = file ? ((file as any).path || (file as any).secure_url || '') : docResult.rows[0].file_path
 
     await pool.query(
       `UPDATE documents SET status = 'pending_review', file_name = $1, file_size = $2, file_path = $3,

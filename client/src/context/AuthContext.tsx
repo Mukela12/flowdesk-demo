@@ -1,43 +1,56 @@
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react'
+import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react'
 import type { User } from '@/types'
-import { mockLogin, mockLogout, MOCK_USERS } from '@/mock/data'
+import { authApi } from '@/api/auth'
 
 interface AuthContextType {
   user: User | null
-  login: (email: string, password: string) => boolean
+  login: (email: string, password: string) => Promise<boolean>
   logout: () => void
   isManager: boolean
   isAccountant: boolean
+  loading: boolean
 }
 
 const AuthContext = createContext<AuthContextType | null>(null)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(() => {
-    const saved = localStorage.getItem('flowdesk_user')
-    if (saved) {
-      const parsed = JSON.parse(saved)
-      // Re-hydrate mock session
-      const found = MOCK_USERS.find((u) => u.id === parsed.id)
-      if (found) mockLogin(found.email, '')
-      return found || null
-    }
-    return null
-  })
+  const [user, setUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState(true)
 
-  const login = useCallback((email: string, password: string) => {
-    const u = mockLogin(email, password)
-    if (u) {
-      setUser(u)
-      localStorage.setItem('flowdesk_user', JSON.stringify(u))
+  // Validate stored token on mount
+  useEffect(() => {
+    const token = localStorage.getItem('flowdesk_token')
+    if (!token) {
+      setLoading(false)
+      return
+    }
+    authApi
+      .getMe()
+      .then((u) => {
+        setUser(u)
+        localStorage.setItem('flowdesk_user', JSON.stringify(u))
+      })
+      .catch(() => {
+        localStorage.removeItem('flowdesk_token')
+        localStorage.removeItem('flowdesk_user')
+      })
+      .finally(() => setLoading(false))
+  }, [])
+
+  const login = useCallback(async (email: string, password: string) => {
+    const res = await authApi.login(email, password)
+    if (res.token && res.user) {
+      localStorage.setItem('flowdesk_token', res.token)
+      localStorage.setItem('flowdesk_user', JSON.stringify(res.user))
+      setUser(res.user)
       return true
     }
     return false
   }, [])
 
   const logout = useCallback(() => {
-    mockLogout()
     setUser(null)
+    localStorage.removeItem('flowdesk_token')
     localStorage.removeItem('flowdesk_user')
   }, [])
 
@@ -49,6 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         logout,
         isManager: user?.role === 'manager',
         isAccountant: user?.role === 'accountant',
+        loading,
       }}
     >
       {children}

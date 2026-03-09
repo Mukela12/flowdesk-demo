@@ -1,10 +1,10 @@
 import { useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { X } from 'lucide-react'
+import { X, Loader2 } from 'lucide-react'
 import { useDropzone } from 'react-dropzone'
 import LordIcon from '@/shared/components/LordIcon'
 import { useAuth } from '@/context/AuthContext'
-import { mockUploadDocument } from '@/mock/data'
+import { documentsApi } from '@/api/documents'
 import type { DocumentType } from '@/types'
 import { DOCUMENT_TYPE_LABELS } from '@/types'
 
@@ -16,6 +16,8 @@ export default function Upload() {
   const [relatedParty, setRelatedParty] = useState('')
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10))
   const [file, setFile] = useState<File | null>(null)
+  const [uploading, setUploading] = useState(false)
+  const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -29,19 +31,26 @@ export default function Upload() {
     maxSize: 10485760,
   })
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!file) return
-    mockUploadDocument({
-      title,
-      type: docType,
-      relatedParty,
-      date,
-      fileName: file.name,
-      fileSize: file.size,
-    })
-    setSuccess(true)
-    setTimeout(() => navigate('/dashboard'), 1500)
+    setUploading(true)
+    setError('')
+    try {
+      await documentsApi.upload({
+        title,
+        type: docType,
+        relatedParty,
+        date,
+        file,
+      })
+      setSuccess(true)
+      setTimeout(() => navigate('/dashboard'), 1500)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Upload failed. Please try again.')
+    } finally {
+      setUploading(false)
+    }
   }
 
   if (!isAccountant) {
@@ -177,21 +186,32 @@ export default function Upload() {
           />
         </div>
 
+        {/* Error */}
+        {error && (
+          <p className="text-sm px-3 py-2 rounded-lg" style={{ background: 'var(--error-bg)', color: 'var(--error-text)' }}>
+            {error}
+          </p>
+        )}
+
         {/* Submit */}
         <div className="flex items-center gap-3 pt-2">
           <button
             type="submit"
-            disabled={!file || !title || !relatedParty}
+            disabled={!file || !title || !relatedParty || uploading}
             className="btn btn--primary"
-            style={{ opacity: (!file || !title || !relatedParty) ? 0.5 : 1 }}
+            style={{ opacity: (!file || !title || !relatedParty || uploading) ? 0.5 : 1 }}
           >
-            <LordIcon
-              name="system-regular-49-upload-file-hover-upload-1"
-              size={16}
-              trigger="click"
-              style={{ filter: 'brightness(0) invert(1)' }}
-            />
-            Submit for Review
+            {uploading ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <LordIcon
+                name="system-regular-49-upload-file-hover-upload-1"
+                size={16}
+                trigger="click"
+                style={{ filter: 'brightness(0) invert(1)' }}
+              />
+            )}
+            {uploading ? 'Uploading...' : 'Submit for Review'}
           </button>
           <button
             type="button"
